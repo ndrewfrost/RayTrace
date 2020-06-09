@@ -1,97 +1,10 @@
-// Andrew Frost
-
-#include <glad/glad.h>
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
+/*
+ * main.cpp
+ *
+ */
 
 #include <iostream>
 #include <fstream>
-
-#include "rapidjson/document.h"
-#include "rapidjson/istreamwrapper.h"
-
-#include "../core/camera.h"
-#include "../core/raytracer.h"
-#include "../core/scene.h"
-
-void display(GLFWwindow* window) {
-    glClearColor(0.5, 0, 0.5, 1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-}
-
-void keyboard(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    if (action == GLFW_PRESS) {
-        return;
-    }
-    switch (key) {
-    case GLFW_KEY_SPACE:
-        break;
-    case GLFW_KEY_ESCAPE:
-        glfwSetWindowShouldClose(window, 1);
-        break;
-    case GLFW_KEY_Q:
-        glfwSetWindowShouldClose(window, 1);
-        break;
-    }
-}
-
-int main(int argc, char** argv) {
-
-    // Parse input arguments
-    char* inputFile = argv[1];
-
-    // Input file check
-    if ((inputFile == NULL) || (inputFile[0] == '\0')) {
-        std::cerr << "ERROR: No input file" << std::endl;
-        return 0;
-    }
-
-    // Parse input file
-    std::ifstream ifs(inputFile);
-    rapidjson::IStreamWrapper is(ifs);
-    rapidjson::Document doc;
-    doc.ParseStream(is);
-
-    // generate a camera
-    Camera* camera = Camera::createCamera(doc["camera"]);
-
-    // generate the scene
-    Scene* scene = new Scene();
-    scene->createScene(doc["scene"]);
-
-    // render scene 
-    RayTracer tracer = RayTracer(camera, scene);
-
-    // GUI
-    glfwInit();
-    GLFWwindow* window = glfwCreateWindow(500, 500, "Title", NULL, NULL);
-    glfwMakeContextCurrent(window);
-    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-    glfwSwapInterval(1);
-    glfwSetKeyCallback(window, keyboard);
-
-    // Main Display Loop
-    while (!glfwWindowShouldClose(window)) {
-
-        display(window);
-
-        if (!tracer.finisedRender()) {
-        }
-      
-        glfwPollEvents();
-        glfwSwapBuffers(window);
-    }
-
-    glfwTerminate();
-
-    delete scene;
-    delete camera;
-
-    return 0;
-}
-
-/*
 
 #include "rapidjson/document.h"
 #include "rapidjson/istreamwrapper.h"
@@ -103,36 +16,85 @@ int main(int argc, char** argv) {
 #include "core/Camera.h"
 #include "core/Scene.h"
 
+
 using namespace rt;
+using namespace rapidjson;
 
 int main(int argc, char* argv[]) {
 
+    //parse commandline arguments
+    //char* inputFile = "../examples/test.json";    //first command line argument holds the path to the json input file
+    //char* outputFile = "C:/Users/Andrew.DESKTOP-P89GBJ7/Desktop/out.ppm";   //second command line argument holds the path to the output image file
+
+    char* inputFile = argv[1];
     char* outputFile = argv[2];
 
-    // Output file check
-    if ((outputFile == NULL) || (outputFile[0] == '\0')) {
-        outputFile = "output.ppm";
-    }
+    std::printf("Input file: %s\n", inputFile);
 
-
-    // Parse input file
+    //parse json input file using rapidjson
     std::ifstream ifs(inputFile);
     IStreamWrapper is(ifs);
-    Document d;
+    Document d;     // d holds the complete json object
     d.ParseStream(is);
 
-    // generate a camera
-    std::unique_ptr<Camera> camera = Camera::createCamera(d["camera"]);
+    //generate a camera according to the input file
+    Camera* camera = Camera::createCamera(d["camera"]);
+    uint32_t width = camera->getWidth();
+    uint32_t height = camera->getHeight();
+    //print camera data (based on the input file provided)
     camera->printCamera();
 
-    // generate the scene
-    std::unique_ptr<Scene> scene = new Scene();
+    //generate the scene according to the input file
+    Scene* scene = new Scene();
     scene->createScene(d["scene"]);
+    std::cout << "Scene Loaded" << std::endl;
 
-    // render scene
-    std::unique_ptr<Vec3f> pixelbuffermain = RayTracer::render(camera, scene);
+    //
+    // Main function, render scene
+    //
 
-    std::printf("Output file : %s\n", outputFile);
+    Vec3f* pixelbuffermain = RayTracer::render(camera, scene, d["nbounces"].GetInt(), camera->getSampling(), camera->getNumSamples());
+    RayTracer::tonemap(pixelbuffermain, width, height);
 
-    // Write rendered scene to file
-    PPMWriter::PPMWriter();*/
+
+    // 
+    // The loop below was used for MSE of sampling
+    //
+
+    /*for (int sampling = 1; sampling <= 45; sampling++) {
+        std::cout << camera->getNumSamples() << std::endl;
+        Vec3f* pixelbuffer = RayTracer::render(camera, scene, d["nbounces"].GetInt(), "random", Vec2i(sampling, sampling));
+
+        //convert linear RGB pixel values [0-1] to range 0-255
+        RayTracer::tonemap(pixelbuffer, width, height);
+        float accuracy = 0;
+        for (int s = 0; s < camera->getWidth() * camera->getHeight(); s++) {
+            //std::cout << pixelbuffermain[s].x << pixelbuffer[s].x << std::endl;
+            float x = pixelbuffermain[s].x - pixelbuffer[s].x;
+            float y = pixelbuffermain[s].y - pixelbuffer[s].y;
+            float z = pixelbuffermain[s].z - pixelbuffer[s].z;
+            accuracy = accuracy + pow(x, 2) + pow(y, 2) + pow(z, 2);
+        }
+
+        std::ofstream myfile;
+        myfile.open("C:/Users/Andrew.DESKTOP-P89GBJ7/Desktop/randomthin.txt", std::ios_base::app);
+        myfile << sampling << "," << accuracy << "\n";
+        myfile.close();
+
+        delete pixelbuffer;
+    }*/
+
+    //free resources when rendering is finished
+    
+    delete scene;
+    delete camera;
+
+    //write rendered scene to file (pixels RGB values must be in range 0-255)
+    PPMWriter::PPMWriter(width, height, pixelbuffermain, outputFile);
+
+    delete pixelbuffermain;
+
+
+}
+
+

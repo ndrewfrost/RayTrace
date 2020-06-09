@@ -1,23 +1,41 @@
-/*
- * pinhole.h
- * Andrew Frost
- * December 2019
- *
- */
+/* Pinhole.h
+*
+*
+*/
 
 #ifndef PINHOLE_H_
 #define PINHOLE_H_
 
-#include "..//core/camera.h"
+#include "core/Camera.h"
 
-class Pinhole : public Camera {
-public:
-    Pinhole(int width, int height, int fov, vec3f location, vec3f look);
-    ~Pinhole() {};
+namespace rt {
 
-    void printCamera();
+    class Pinhole :public Camera {
+    public:
 
-    void getOriginDirection();
-};
+        //
+        // Constructors
+        //
+        Pinhole(int width, int height, int fov, Vec3f(location), Vec3f(look));
 
-#endif // !PINHOLE_H_
+        //
+        //Destructor
+        //
+        ~Pinhole() {};
+
+        //
+        // print function (implementing abstract function of base class)
+        //
+        void printCamera();
+
+        void getOriginDirection(float& pixelX, float& pixelY, Vec3f& origin, Vec3f& direction, Vec2i& sample, Vec2i& samplingSize);
+    };
+
+
+
+} //namespace rt
+
+
+
+
+#endif /* PINHOLE_H_ */
