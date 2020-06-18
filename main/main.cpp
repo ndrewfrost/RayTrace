@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <utility> 
 
 #include "rapidjson/document.h"
 #include "rapidjson/istreamwrapper.h"
@@ -14,13 +15,29 @@
 #include "../core/raytracer.h"
 #include "../core/scene.h"
 
-void display(GLFWwindow* window) {
+using std::unique_ptr;
+
+//------------------------------------------------------------------------------------
+// 
+//
+static void display(GLFWwindow* window) {
     glClearColor(0.5, 0, 0.5, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 }
 
-void keyboard(GLFWwindow* window, int key, int scancode, int action, int mods) {
+//-------------------------------------------------------------------------
+// GLFW on Error Callback
+//
+static void onErrorCallback(int error, const char* description)
+{
+    std::cerr << "GLFW Error " << error << ": " << description << std::endl;
+}
+
+//------------------------------------------------------------------------------------
+// glfw Keyboard Callback
+//
+static void keyboard(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (action == GLFW_PRESS) {
         return;
     }
@@ -36,6 +53,9 @@ void keyboard(GLFWwindow* window, int key, int scancode, int action, int mods) {
     }
 }
 
+//------------------------------------------------------------------------------------
+// Main / Entry Point
+//
 int main(int argc, char** argv) {
 
     // Parse input arguments
@@ -54,39 +74,39 @@ int main(int argc, char** argv) {
     doc.ParseStream(is);
 
     // generate a camera
-    Camera* camera = Camera::createCamera(doc["camera"]);
+    unique_ptr<Camera> camera;
 
     // generate the scene
-    Scene* scene = new Scene();
-    scene->createScene(doc["scene"]);
+    unique_ptr<Scene> scene;
 
     // render scene 
-    RayTracer tracer = RayTracer(camera, scene);
+    RayTracer tracer;
 
     // GUI
-    glfwInit();
+    glfwSetErrorCallback(onErrorCallback);
+    if (!glfwInit()) return;
+
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
     GLFWwindow* window = glfwCreateWindow(500, 500, "Title", NULL, NULL);
+
+    glfwSetKeyCallback(window, keyboard);
+
     glfwMakeContextCurrent(window);
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
     glfwSwapInterval(1);
-    glfwSetKeyCallback(window, keyboard);
+    
 
     // Main Display Loop
     while (!glfwWindowShouldClose(window)) {
 
         display(window);
-
-        if (!tracer.finisedRender()) {
-        }
-      
+              
         glfwPollEvents();
         glfwSwapBuffers(window);
     }
 
     glfwTerminate();
-
-    delete scene;
-    delete camera;
 
     return 0;
 }
