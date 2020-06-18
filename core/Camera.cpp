@@ -1,19 +1,31 @@
 /*
  * camera.cpp
  * Andrew Frost
- * December 2019
+ * 2020
  *
  */
 
 #include "camera.h"
 
-void Camera::lookMatrix() {
-    vec3f dir = (location - lookAt).normalize();
+#include "../cameras/pinhole.h"
+ //#include "../cameras/thinlens.h"
+
+namespace rt {
+
+///////////////////////////////////////////////////////////////////////////
+// Camera                                                                //
+///////////////////////////////////////////////////////////////////////////
+
+//-------------------------------------------------------------------------
+// Create a look at Matrix from camera position and look at vectors
+//
+void Camera::generateLookMatrix() {
+    glm::vec3 dir = glm::normalize(location - lookAt);
 
     //vec3f(0,1,0) is up vector
-    vec3f right = (vec3f(0, 1, 0).crossProduct(dir)).normalize();
+    glm::vec3 right = glm::normalize(glm::cross(glm::vec3(0, 1, 0), dir)); 
 
-    vec3f up = dir.crossProduct(right);
+    glm::vec3 up = glm::cross(dir, right);
 
     cameraToWorld[3][0] = location.x;
     cameraToWorld[3][1] = location.y;
@@ -37,7 +49,11 @@ void Camera::lookMatrix() {
     cameraToWorld[3][3] = 1;
 }
 
-Camera* Camera::createCamera(Value& cameraSpecs)
+//-------------------------------------------------------------------------
+// Create a camera object, either Pinhole or Thin lens
+// Depending on the data from JSON in Value& CameraSpecs
+//
+std::unique_ptr<Camera> Camera::createCamera(Value& cameraSpecs)
 {
     // check if defined cameratype
     if (!cameraSpecs.HasMember("type")) {
@@ -47,19 +63,28 @@ Camera* Camera::createCamera(Value& cameraSpecs)
 
     const char* cameraType = cameraSpecs["type"].GetString();
 
+    // Pinhole Camera
     if (strcmp(cameraType, "pinhole") == 0) {
-        return new Pinhole(cameraSpecs["width"].GetInt(),
-            cameraSpecs["height"].GetInt(),
-            cameraSpecs["fov"].GetInt(),
-            vec3f(cameraSpecs["location"][0].GetFloat(), cameraSpecs["location"][1].GetFloat(), cameraSpecs["location"][2].GetFloat()),
-            vec3f(cameraSpecs["look"][0].GetFloat(), cameraSpecs["look"][1].GetFloat(), cameraSpecs["look"][2].GetFloat()));
-
+        return std::make_unique<Pinhole>(Pinhole(cameraSpecs["width"].GetInt(),
+                                                 cameraSpecs["height"].GetInt(),
+                                                 cameraSpecs["fov"].GetInt(),
+                                                 glm::vec3(cameraSpecs["location"][0].GetFloat(),
+                                                           cameraSpecs["location"][1].GetFloat(),
+                                                           cameraSpecs["location"][2].GetFloat()),
+                                                 glm::vec3(cameraSpecs["look"][0].GetFloat(),
+                                                           cameraSpecs["look"][1].GetFloat(),
+                                                           cameraSpecs["look"][2].GetFloat())));
     }
+    // Thin lens Camera
     else if (strcmp(cameraType, "thinlens") == 0) {
-
+        std::cerr << "[thinlens] is yet to be implemented" << std::endl;
+        exit(-1);
     }
+    // Error
     else {
         std::cerr << "Camera type can either be: [pinhole] or [thinlens]" << std::endl;
         exit(-1);
     }
 }
+
+} // namespace rt

@@ -1,7 +1,7 @@
 /*
  * camera.h
  * Andrew Frost
- * December 2019
+ * 2020
  *
  */
 
@@ -9,33 +9,41 @@
 #define CAMERA_H_
 
 #include <iostream>
-#include "..//math/geometry.h"
-#include "../cameras/pinhole.h"
-//#include "../cameras/thinlens.h"
+#include <utility>
+
+#include "../common/glm_common.h"
 
 #include "rapidjson/document.h"
 using namespace rapidjson;
 
-class Camera {
+namespace rt {
+
+///////////////////////////////////////////////////////////////////////////
+// Camera                                                                //
+///////////////////////////////////////////////////////////////////////////
+
+class Camera
+{
 public:
-    Camera() {};
-    virtual ~Camera() {};
+    Camera() = default;
 
-    void lookMatrix();
+    static std::unique_ptr<Camera> createCamera(Value& cameraSpecs);
 
-    static Camera* createCamera(Value& cameraSpecs);
+    virtual ~Camera() = default;
 
     virtual void printCamera() = 0;
-    
+
+    void generateLookMatrix();
+
 protected:
     int height, width, fov;
 
-    vec3f location;
-    vec3f lookAt;
+    glm::vec3 location;
+    glm::vec3 lookAt;
 
-    Matrix44f cameraToWorld;
-
+    glm::mat4 cameraToWorld;
 };
 
-
+} // namespace rt
+ 
 #endif // !CAMERA_H_

@@ -17,7 +17,7 @@
 
 using std::unique_ptr;
 
-//------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 // 
 //
 static void display(GLFWwindow* window) {
@@ -34,7 +34,7 @@ static void onErrorCallback(int error, const char* description)
     std::cerr << "GLFW Error " << error << ": " << description << std::endl;
 }
 
-//------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 // glfw Keyboard Callback
 //
 static void keyboard(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -74,17 +74,17 @@ int main(int argc, char** argv) {
     doc.ParseStream(is);
 
     // generate a camera
-    unique_ptr<Camera> camera;
+    unique_ptr<rt::Camera> camera = rt::Camera::createCamera(doc["camera"]);
 
     // generate the scene
-    unique_ptr<Scene> scene;
+    //unique_ptr<Scene> scene = Scene::createScene(doc["scene"]);
 
     // render scene 
-    RayTracer tracer;
+    //RayTracer tracer;
 
     // GUI
     glfwSetErrorCallback(onErrorCallback);
-    if (!glfwInit()) return;
+    if (!glfwInit()) return EXIT_FAILURE;
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
@@ -95,64 +95,18 @@ int main(int argc, char** argv) {
     glfwMakeContextCurrent(window);
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
     glfwSwapInterval(1);
-    
+
 
     // Main Display Loop
     while (!glfwWindowShouldClose(window)) {
 
         display(window);
-              
+
         glfwPollEvents();
         glfwSwapBuffers(window);
     }
 
     glfwTerminate();
 
-    return 0;
-}
-
-/*
-
-#include "rapidjson/document.h"
-#include "rapidjson/istreamwrapper.h"
-
-#include "math/geometry.h"
-#include "parsers/PPMWriter.h"
-
-#include "core/RayTracer.h"
-#include "core/Camera.h"
-#include "core/Scene.h"
-
-using namespace rt;
-
-int main(int argc, char* argv[]) {
-
-    char* outputFile = argv[2];
-
-    // Output file check
-    if ((outputFile == NULL) || (outputFile[0] == '\0')) {
-        outputFile = "output.ppm";
-    }
-
-
-    // Parse input file
-    std::ifstream ifs(inputFile);
-    IStreamWrapper is(ifs);
-    Document d;
-    d.ParseStream(is);
-
-    // generate a camera
-    std::unique_ptr<Camera> camera = Camera::createCamera(d["camera"]);
-    camera->printCamera();
-
-    // generate the scene
-    std::unique_ptr<Scene> scene = new Scene();
-    scene->createScene(d["scene"]);
-
-    // render scene
-    std::unique_ptr<Vec3f> pixelbuffermain = RayTracer::render(camera, scene);
-
-    std::printf("Output file : %s\n", outputFile);
-
-    // Write rendered scene to file
-    PPMWriter::PPMWriter();*/
+    return EXIT_SUCCESS;
+} /
