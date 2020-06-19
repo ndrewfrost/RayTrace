@@ -1,31 +1,47 @@
 /*
  * parser.h
  * Andrew Frost
- * December 2019
+ * 2020
  *
  */
 
 #ifndef PARSER_H_
 #define PARSER_H_
 
-#include "parsers/token.h"
-#include "parsers/tokeniser.h"
+#include <vector>
+#include <utility>
+#include <iostream>
 
-namespace rt {
+#include "../core/light.h"
+#include "../core/geometry.h"
+#include "../geometry/sphere.h"
+#include "../core/camera.h"
+#include "../cameras/pinhole.h"
+#include "../core/scene.h"
 
-    class parser{
-    public:
+#include "rapidjson/document.h"
+using namespace rapidjson;
 
-        Camera parseCamera();
-        Scene parseScene();
-        
-    private:
-        void nextToken();
-        Token expect(/* list of expected/accepted tokens */);
-        bool accept();
+///////////////////////////////////////////////////////////////////////////
+// Parser                                                                //
+///////////////////////////////////////////////////////////////////////////
+
+class Parser
+{
+public:
+    static std::unique_ptr<Camera> readCamera(Value& value);
+
+    static std::unique_ptr<Scene> readScene(Value& value);
+
+    static std::shared_ptr<Geometry> readGeometry(Value& geometry);
+
+    static glm::vec3 readVector(Value& value, std::string jsonLoc);
+
+    static float readFloat(Value& value, std::string jsonLoc);
+
+    static std::string readString(Value& value, std::string jsonLoc);
+};
 
 
-    };
-} // namespace rt
 
 #endif // !PARSER_H_
