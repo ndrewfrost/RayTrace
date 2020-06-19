@@ -25,11 +25,20 @@ std::unique_ptr<Camera> Parser::readCamera(Value& value)
     // Pinhole Camera
     if (cameraType == "pinhole") {
 
-        glm::vec3 origin = readVector(value["origin"], "Camera origin");
-        glm::vec3 lookAt = readVector(value["lookat"], "Camera lookAt");
-        glm::vec3 vup = readVector(value["vup"], "Camera vup");
-        float hfov = readFloat(value["hfov"], "Camera hfov");
-        float aspectRatio = readFloat(value["aspectratio"], "Camera aspect ratio");
+        glm::vec3 origin  = readVector(value["origin"], "Camera origin");
+        glm::vec3 lookAt  = readVector(value["lookat"], "Camera lookAt");
+        glm::vec3 vup     = readVector(value["vup"], "Camera vup");
+        float hfov        = readFloat(value["hfov"], "Camera hfov");
+
+        std::vector<float> values;
+        for (auto& v : value["ratio"].GetArray()) {
+            assert(v.IsFloat() && ("ratio: vector values must all be floats"));
+            values.push_back(v.GetFloat());
+        }
+        if (values.size() != 2)
+            std::cerr << "ratio: vector size must be 2" << std::endl;
+
+        float aspectRatio = values[0] / values[1];
 
         return std::make_unique<Pinhole>(Pinhole(origin, lookAt, vup, hfov, aspectRatio));
     }
