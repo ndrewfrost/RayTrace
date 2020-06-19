@@ -1,23 +1,35 @@
 /*
  * pinhole.h
  * Andrew Frost
- * December 2019
+ * 2020
  *
  */
 
 #ifndef PINHOLE_H_
 #define PINHOLE_H_
 
-#include "..//core/camera.h"
+#include "../core/camera.h"
+#include "../core/ray.h"
 
-class Pinhole : public Camera {
+ ///////////////////////////////////////////////////////////////////////////
+ // Pinhole                                                               //
+ ///////////////////////////////////////////////////////////////////////////
+
+class Pinhole : public Camera
+{
 public:
-    Pinhole(int width, int height, int fov, vec3f location, vec3f look);
-    ~Pinhole() {};
+    Pinhole(glm::vec3 origin, glm::vec3 lookAt, glm::vec3 vup, float hfov, float aspectRatio);
+
+    ~Pinhole() = default;
+
+    Ray getRay(float s, float t) const;
 
     void printCamera();
 
-    void getOriginDirection();
+private:
+
 };
+
+
 
 #endif // !PINHOLE_H_
