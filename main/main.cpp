@@ -14,6 +14,7 @@
 #include "../core/camera.h"
 #include "../core/raytracer.h"
 #include "../core/scene.h"
+#include "../parsers/parser.h"
 
 using std::unique_ptr;
 
@@ -53,9 +54,11 @@ static void keyboard(GLFWwindow* window, int key, int scancode, int action, int 
     }
 }
 
-//------------------------------------------------------------------------------------
-// Main / Entry Point
-//
+
+///////////////////////////////////////////////////////////////////////////
+// Main / Entry Point                                                    //
+///////////////////////////////////////////////////////////////////////////
+
 int main(int argc, char** argv) {
 
     // Parse input arguments
@@ -74,10 +77,11 @@ int main(int argc, char** argv) {
     doc.ParseStream(is);
 
     // generate a camera
-    unique_ptr<rt::Camera> camera = rt::Camera::createCamera(doc["camera"]);
+    assert(doc.HasMember("camera") && "Input Json must have member camera");
+    unique_ptr<Camera> camera = Parser::readCamera(doc["camera"]);
 
     // generate the scene
-    //unique_ptr<Scene> scene = Scene::createScene(doc["scene"]);
+    unique_ptr<Scene> scene = Parser::readScene(doc["scene"]);
 
     // render scene 
     //RayTracer tracer;
@@ -88,7 +92,7 @@ int main(int argc, char** argv) {
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-    GLFWwindow* window = glfwCreateWindow(500, 500, "Title", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(500, 500, "RayTracing", NULL, NULL);
 
     glfwSetKeyCallback(window, keyboard);
 
@@ -109,4 +113,4 @@ int main(int argc, char** argv) {
     glfwTerminate();
 
     return EXIT_SUCCESS;
-} /
+}
