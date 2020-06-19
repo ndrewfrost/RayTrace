@@ -1,7 +1,7 @@
 /*
  * scene.h
  * Andrew Frost
- * December 2019
+ * 2020
  *
  */
 
@@ -9,14 +9,27 @@
 #define SCENE_H_
 
 #include <vector>
+#include <utility>
 
-#include "rapidjson/document.h"
-using namespace rapidjson;
+#include "geometry.h"
+#include "../geometry/sphere.h"
 
-class Scene {
+ ///////////////////////////////////////////////////////////////////////////
+ // Scene                                                                 //
+ ///////////////////////////////////////////////////////////////////////////
+
+class Scene
+{
 public:
-    void createScene(Value& sceneSpecs);
+    Scene() = default;
+
+    Scene(std::vector<std::shared_ptr<Geometry>> geometry) : m_objects(geometry) {}
+
+    ~Scene() = default;
+
 private:
+    std::vector<std::shared_ptr<Geometry>> m_objects;
+
 };
 
 #endif // !SCENE_H_
