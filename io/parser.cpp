@@ -62,7 +62,7 @@ std::unique_ptr<Scene> Parser::readScene(Value& value)
     std::vector<std::shared_ptr<Geometry>> sceneGeometry;
 
     Value& geometry = value["geometry"];
-    for (int i = 0; i < geometry.Size(); i++) {
+    for (unsigned int i = 0; i < geometry.Size(); i++) {
         sceneGeometry.push_back(readGeometry(geometry[i]));
     }
 
