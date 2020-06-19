@@ -1,8 +1,6 @@
 // Andrew Frost
 
-#include <glad/glad.h>
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
+#include <SDL.h>
 
 #include <iostream>
 #include <fstream>
@@ -14,46 +12,13 @@
 #include "../core/camera.h"
 #include "../core/raytracer.h"
 #include "../core/scene.h"
-#include "../parsers/parser.h"
+#include "../io/parser.h"
+#include "../io/display.h"
 
 using std::unique_ptr;
 
-//-------------------------------------------------------------------------
-// 
-//
-static void display(GLFWwindow* window) {
-    glClearColor(0.5, 0, 0.5, 1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-}
-
-//-------------------------------------------------------------------------
-// GLFW on Error Callback
-//
-static void onErrorCallback(int error, const char* description)
-{
-    std::cerr << "GLFW Error " << error << ": " << description << std::endl;
-}
-
-//-------------------------------------------------------------------------
-// glfw Keyboard Callback
-//
-static void keyboard(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    if (action == GLFW_PRESS) {
-        return;
-    }
-    switch (key) {
-    case GLFW_KEY_SPACE:
-        break;
-    case GLFW_KEY_ESCAPE:
-        glfwSetWindowShouldClose(window, 1);
-        break;
-    case GLFW_KEY_Q:
-        glfwSetWindowShouldClose(window, 1);
-        break;
-    }
-}
-
+const unsigned int g_width = 500;
+const unsigned int g_height = 500;
 
 ///////////////////////////////////////////////////////////////////////////
 // Main / Entry Point                                                    //
@@ -67,14 +32,20 @@ int main(int argc, char** argv) {
     // Input file check
     if ((inputFile == NULL) || (inputFile[0] == '\0')) {
         std::cerr << "ERROR: No input file" << std::endl;
-        return 0;
+        return EXIT_FAILURE;
     }
 
     // Parse input file
     std::ifstream ifs(inputFile);
+    if (!ifs) {
+        std::cout << "[" << inputFile << "] file cannot be found" << std::endl;
+        return EXIT_FAILURE;
+    }
+
     rapidjson::IStreamWrapper is(ifs);
     rapidjson::Document doc;
     doc.ParseStream(is);
+    ifs.close();
 
     // generate a camera
     assert(doc.HasMember("camera") && "Input Json must have member camera");
@@ -87,30 +58,45 @@ int main(int argc, char** argv) {
     //RayTracer tracer;
 
     // GUI
-    glfwSetErrorCallback(onErrorCallback);
-    if (!glfwInit()) return EXIT_FAILURE;
+    SDL_Init(SDL_INIT_VIDEO);
 
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    SDL_Window* window = SDL_CreateWindow(
+        "Ray Tracing",
+        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+        g_width, g_height,
+        SDL_WINDOW_SHOWN);
 
-    GLFWwindow* window = glfwCreateWindow(500, 500, "RayTracing", NULL, NULL);
+    SDL_Surface* surface = SDL_GetWindowSurface(window);
 
-    glfwSetKeyCallback(window, keyboard);
+    uint32_t* buffer = static_cast<uint32_t*>(surface->pixels);
 
-    glfwMakeContextCurrent(window);
-    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-    glfwSwapInterval(1);
+    bool exit = false;
 
+    SDL_LockSurface(surface);
 
-    // Main Display Loop
-    while (!glfwWindowShouldClose(window)) {
+    // Write color values to pixels here.
+    // Example of making row 10 column 20 a white pixel
+    buffer[10 * g_width + 20] = 0xFFFFFFFF;
 
-        display(window);
+    SDL_UnlockSurface(surface);
+    SDL_UpdateWindowSurface(window);
 
-        glfwPollEvents();
-        glfwSwapBuffers(window);
+    // Wait for window exit
+    while (!exit)
+    {
+        SDL_Event event;
+
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_QUIT)
+            {
+                exit = true;
+            }
+        }
     }
 
-    glfwTerminate();
+    SDL_DestroyWindow(window);
+    SDL_Quit();
 
     return EXIT_SUCCESS;
 }
