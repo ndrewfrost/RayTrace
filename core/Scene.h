@@ -9,7 +9,7 @@
 #define SCENE_H_
 
 #include <vector>
-#include <utility>
+#include <memory>
 
 #include "geometry.h"
 #include "../geometry/sphere.h"

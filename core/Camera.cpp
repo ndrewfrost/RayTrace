@@ -20,8 +20,8 @@
 Camera::Camera(glm::vec3 origin, glm::vec3 lookAt, glm::vec3 vup, float hfov, float aspectRatio)
 {
     float theta = degree2Rad(hfov);
-    float width = tan(theta / 2);
-    float viewportWidth = 2.0 * width;
+    float width = tan(theta / 2.f);
+    float viewportWidth = 2.0f * width;
     float viewportHeight = aspectRatio * viewportWidth;
 
     glm::vec3 w = glm::normalize(origin - lookAt);
@@ -31,5 +31,5 @@ Camera::Camera(glm::vec3 origin, glm::vec3 lookAt, glm::vec3 vup, float hfov, fl
     m_origin = origin;
     m_horizontal = viewportWidth * u;
     m_vertical = viewportHeight * v;
-    m_lowerLeftCorner = origin - (m_horizontal / 2) - (m_vertical / 2) - w;
+    m_lowerLeftCorner = origin - (m_horizontal * 0.5f) - (m_vertical * 0.5f) - w;
 }

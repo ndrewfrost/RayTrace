@@ -96,7 +96,7 @@ glm::vec3 Parser::readVector(Value& value, std::string jsonLoc)
         values.push_back(v.GetFloat());
     }
 
-    if (values.size != 3)
+    if (values.size() != 3)
         std::cerr << jsonLoc << ": vector size must be 3" << std::endl;
 
     return glm::vec3(values[0], values[1], values[2]);
