@@ -12,11 +12,10 @@
 #include <utility>
 
 #include "../common/glm_common.h"
+#include "../common/math.h"
 
 #include "rapidjson/document.h"
 using namespace rapidjson;
-
-namespace rt {
 
 ///////////////////////////////////////////////////////////////////////////
 // Camera                                                                //
@@ -25,25 +24,18 @@ namespace rt {
 class Camera
 {
 public:
-    Camera() = default;
-
-    static std::unique_ptr<Camera> createCamera(Value& cameraSpecs);
+    Camera(glm::vec3 origin, glm::vec3 lookAt, glm::vec3 vup, float hfov, float aspectRatio);
 
     virtual ~Camera() = default;
 
     virtual void printCamera() = 0;
 
-    void generateLookMatrix();
-
 protected:
-    int height, width, fov;
+    glm::vec3 m_origin;
+    glm::vec3 m_lowerLeftCorner;
 
-    glm::vec3 location;
-    glm::vec3 lookAt;
-
-    glm::mat4 cameraToWorld;
+    glm::vec3 m_horizontal;
+    glm::vec3 m_vertical;
 };
 
-} // namespace rt
- 
 #endif // !CAMERA_H_
