@@ -1,17 +1,24 @@
 /*
  * material.h
  * Andrew Frost
- * December 2019
+ * 2020
  *
  */
 
 #ifndef MATERIAL_H_
 #define MATERIAL_H_
 
-namespace rt {
+ ///////////////////////////////////////////////////////////////////////////
+ // Material                                                              //
+ ///////////////////////////////////////////////////////////////////////////
 
-  
+class Material
+{
+public:
+    Material() = default;
+    ~Material() = default;
 
-} // namespace rt
+
+};
 
 #endif // !MATERIAL_H_

@@ -1,17 +1,22 @@
 /*
  * poisson.h
  * Andrew Frost
- * December 2019
+ * 2020
  *
  */
 
 #ifndef POISSON_H_
 #define POISSON_H_
 
-namespace rt {
+#include "../core/sampler.h"
 
-  
+///////////////////////////////////////////////////////////////////////////
+// Poisson Sampler                                                       //
+///////////////////////////////////////////////////////////////////////////
 
-} // namespace rt
+class PoissonSampler : public Sampler
+{
+    PoissonSampler(int numberSamples);
+};
 
 #endif // !POISSON_H_

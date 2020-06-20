@@ -1,17 +1,22 @@
 /*
  * random.h
  * Andrew Frost
- * December 2019
+ * 2020
  *
  */
 
 #ifndef RANDOM_H_
 #define RANDOM_H_
 
-namespace rt {
+#include "../core/sampler.h"
 
-  
+///////////////////////////////////////////////////////////////////////////
+// Random Sampler                                                        //
+///////////////////////////////////////////////////////////////////////////
 
-} // namespace rt
+class RandomSampler : public Sampler
+{
+    RandomSampler(int numberSamples);
+};
 
 #endif // !RANDOM_H_

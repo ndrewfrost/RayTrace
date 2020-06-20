@@ -1,17 +1,22 @@
 /*
  * halton.h
  * Andrew Frost
- * December 2019
+ * 2020
  *
  */
 
 #ifndef HALTON_H_
 #define HALTON_H_
 
-namespace rt {
+#include "../core/sampler.h"
 
-  
+///////////////////////////////////////////////////////////////////////////
+// Halton Sampler                                                        //
+///////////////////////////////////////////////////////////////////////////
 
-} // namespace rt
+class HaltonSampler : public Sampler
+{
+    HaltonSampler(int numberSamples);
+};
 
 #endif // !HALTON_H_
