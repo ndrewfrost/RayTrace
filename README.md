@@ -8,8 +8,9 @@ Simple pixel tracer, renders all objects in scene
 
 ![Example Image](examples/example.JPG)
 
-Next:
-materials
+TODO:
+materials, Sampling, Triangle, Quad, TriMesh,
+Shadows, Ray bouncing
 
 ## Third-Party Dependencies
 
