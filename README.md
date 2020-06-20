@@ -9,3 +9,9 @@ Simple pixel tracer, renders all objects in scene
 
 Next:
 materials
+
+## Third-Party Dependencies
+
+- [glm](https://github.com/g-truc/glm): OpenGL Mathematics
+
+- [SDL](https://www.libsdl.org/)
