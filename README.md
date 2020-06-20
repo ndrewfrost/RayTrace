@@ -5,7 +5,15 @@ The old completed cw can be found in another [branch](https://github.com/ndrewfr
 
 Current Progression:
 Simple pixel tracer, renders all objects in scene
+
 ![Example Image](examples/example.JPG)
 
-Next:
-materials
+TODO:
+materials, Sampling, Triangle, Quad, TriMesh,
+Shadows, Ray bouncing
+
+## Third-Party Dependencies
+
+- [glm](https://github.com/g-truc/glm): OpenGL Mathematics
+
+- [SDL](https://www.libsdl.org/)
