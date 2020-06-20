@@ -27,7 +27,6 @@ public:
 
     ~Scene() = default;
 
-private:
     std::vector<std::shared_ptr<Geometry>> m_objects;
 
 };
