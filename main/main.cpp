@@ -19,6 +19,7 @@ using std::shared_ptr;
 
 const unsigned int g_width = 500;
 const unsigned int g_height = 500;
+const unsigned int g_samples = 5;
 
 ///////////////////////////////////////////////////////////////////////////
 // Main / Entry Point                                                    //
@@ -56,7 +57,7 @@ int main(int argc, char** argv) {
     shared_ptr<Scene> scene = Parser::readScene(doc["scene"]);
 
     // generate output
-    shared_ptr<DisplayImage> output = std::make_shared<DisplayImage>(g_width, g_height);
+    shared_ptr<DisplayImage> output = std::make_shared<DisplayImage>(g_width, g_height, g_samples);
 
     // render scene 
     RayTracer tracer = RayTracer(camera, scene, output);
@@ -101,6 +102,6 @@ int main(int argc, char** argv) {
 
     SDL_DestroyWindow(window);
     SDL_Quit();
-    
+
     return EXIT_SUCCESS;
 }
