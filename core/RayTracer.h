@@ -1,24 +1,40 @@
 /*
  * raytracer.h
  * Andrew Frost
- * December 2019
+ * 2020
  *
  */
 
 #ifndef RAYTRACER_H_
 #define RAYTRACER_H_
 
-class RayTracer {
-public:
-    RayTracer(Camera* camera, Scene* scene);
-    ~RayTracer();
+#include <memory>
+#include "camera.h"
+#include "scene.h"
+#include "../io/display.h"
+#include "ray.h"
 
-    bool finisedRender();
+///////////////////////////////////////////////////////////////////////////
+// RayTracer                                                             //
+///////////////////////////////////////////////////////////////////////////
+
+class RayTracer {
+    
+public:
+    RayTracer(std::shared_ptr<Camera>       camera, 
+              std::shared_ptr<Scene>        scene, 
+              std::shared_ptr<DisplayImage> output);
+   
+    ~RayTracer() = default;
+
+    void render();
+
+    glm::vec3 rayColor(const Ray& r);
 
 private:
-    std::unique_ptr<Camera> camera;
-    std::unique_ptr<Scene> scene;
-    bool rendered;
+    std::shared_ptr<Camera>       m_camera = nullptr;
+    std::shared_ptr<Scene>        m_scene  = nullptr;
+    std::shared_ptr<DisplayImage> m_output = nullptr;
 };
 
 #endif // !RAYTRACER_H_

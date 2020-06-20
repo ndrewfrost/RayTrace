@@ -15,7 +15,7 @@
 #include "../io/parser.h"
 #include "../io/display.h"
 
-using std::unique_ptr;
+using std::shared_ptr;
 
 const unsigned int g_width = 500;
 const unsigned int g_height = 500;
@@ -50,13 +50,17 @@ int main(int argc, char** argv) {
     // generate a camera
     assert(doc.HasMember("camera") && "Input Json must have member camera");
     float aspectRatio = static_cast<float>(g_width) / static_cast<float>(g_height);
-    unique_ptr<Camera> camera = Parser::readCamera(doc["camera"], aspectRatio);
+    shared_ptr<Camera> camera = Parser::readCamera(doc["camera"], aspectRatio);
 
     // generate the scene
-    unique_ptr<Scene> scene = Parser::readScene(doc["scene"]);
+    shared_ptr<Scene> scene = Parser::readScene(doc["scene"]);
+
+    // generate output
+    shared_ptr<DisplayImage> output = std::make_shared<DisplayImage>(g_width, g_height);
 
     // render scene 
-    //RayTracer tracer;
+    RayTracer tracer = RayTracer(camera, scene, output);
+    tracer.render();
 
     // GUI
     SDL_Init(SDL_INIT_VIDEO);
@@ -75,9 +79,8 @@ int main(int argc, char** argv) {
 
     SDL_LockSurface(surface);
 
-    // Write color values to pixels here.
-    // Example of making row 10 column 20 a white pixel
-    buffer[10 * g_width + 20] = 0xFFFFFFFF;
+    // Write color values to pixels
+    output->fillBuffer(buffer);
 
     SDL_UnlockSurface(surface);
     SDL_UpdateWindowSurface(window);
@@ -98,6 +101,6 @@ int main(int argc, char** argv) {
 
     SDL_DestroyWindow(window);
     SDL_Quit();
-
+    
     return EXIT_SUCCESS;
 }
