@@ -18,7 +18,7 @@
  // Scene                                                                 //
  ///////////////////////////////////////////////////////////////////////////
 
-class Scene
+class Scene : Geometry
 {
 public:
     Scene() = default;
@@ -27,6 +27,9 @@ public:
 
     ~Scene() = default;
 
+    bool intersect(const Ray& ray, float tMin, float tMax, HitRecord& record);
+
+private:
     std::vector<std::shared_ptr<Geometry>> m_objects;
 
 };

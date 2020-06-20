@@ -48,13 +48,14 @@ void RayTracer::render()
 //
 glm::vec3 RayTracer::rayColor(const Ray& r)
 {
-    float t = m_scene->m_objects[0]->intersect(r);
-    if (t > 0.0f) {
-        glm::vec3 normal = glm::normalize(r.at(t) - glm::vec3(0.f, 0.f, -1.f));
-        return 0.5f * glm::vec3(normal.x + 1.f, normal.y + 1.f, normal.z + 1.f);
+    HitRecord record;
+    // TODO Material Color, Currently Renders Normals
+    if (m_scene->intersect(r, 0, infinity, record)) {
+        return 0.5f * (record.normal + glm::vec3(1.0, 1.0, 1.0));
     }
 
+    // Background color
     glm::vec3 unitDir = glm::normalize(r.direction());
-    t = 0.5f * (unitDir.y + 1.0f);
-    return (1.0f - t) * glm::vec3(1.0f, 1.0f, 1.0f) + t * glm::vec3(0.5f, 0.7f, 1.0f);
+    float t = 0.5f * (unitDir.y + 1.0f);
+    return (1.0f - t) * glm::vec3(1.0f, 1.0f, 1.0f) + t * glm::vec3(0.3f, 0.4f, 0.8f);
 }
