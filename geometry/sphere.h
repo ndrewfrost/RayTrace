@@ -21,7 +21,7 @@ public:
 
     ~Sphere() {}
 
-    bool intersect(const Ray& ray);
+    float intersect(const Ray& ray);
 
 private:
     glm::vec3 m_center;

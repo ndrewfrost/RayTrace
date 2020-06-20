@@ -22,7 +22,7 @@ public:
 
     virtual ~Geometry() = default;
 
-    virtual bool intersect(const Ray& ray) = 0;
+    virtual float intersect(const Ray& ray) = 0;
 };
 
 
