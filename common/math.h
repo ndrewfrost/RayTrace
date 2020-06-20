@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <string>
 
+constexpr float infinity = std::numeric_limits<float>::infinity();
 constexpr float PI = 3.14159265f;
 
 //-------------------------------------------------------------------------
