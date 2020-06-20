@@ -27,6 +27,8 @@ public:
     glm::vec3 origin()    const { return m_origin; }
     glm::vec3 direction() const { return m_direction; }
 
+    glm::vec3 at(float t) const { return m_origin + t * m_direction; }
+
 public:
     glm::vec3 m_origin;
     glm::vec3 m_direction;
