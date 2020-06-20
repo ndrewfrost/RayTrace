@@ -1,22 +1,22 @@
 /*
- * disney.h
+ * dielectric.h
  * Andrew Frost
  * 2020
  *
  */
 
-#ifndef DISNEY_H_
-#define DISNEY_H_
+#ifndef DIELECTRIC_H_
+#define DIELECTRIC_H_
 
 #include "../core/material.h"
 
 ///////////////////////////////////////////////////////////////////////////
-// Disney                                                                //
+// Dielectric                                                            //
 ///////////////////////////////////////////////////////////////////////////
 
-class Disney : public Material
+class Dielectric : public Material
 {
 
 };
 
-#endif // !DISNEY_H_
+#endif // !DIELECTRIC_H_

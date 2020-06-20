@@ -1,22 +1,22 @@
 /*
- * disney.h
+ * BlinnPhong.h
  * Andrew Frost
  * 2020
  *
  */
 
-#ifndef DISNEY_H_
-#define DISNEY_H_
+#ifndef BLINN_PHONG_H_
+#define BLINN_PHONG_H_
 
 #include "../core/material.h"
 
 ///////////////////////////////////////////////////////////////////////////
-// Disney                                                                //
+// BlinnPhong                                                            //
 ///////////////////////////////////////////////////////////////////////////
 
-class Disney : public Material
+class BlinnPhong : public Material
 {
 
 };
 
-#endif // !DISNEY_H_
+#endif // !BLINN_PHONG_H_
