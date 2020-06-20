@@ -8,24 +8,25 @@
 #ifndef PINHOLE_H_
 #define PINHOLE_H_
 
-#include "../core/camera.h"
 #include "../core/ray.h"
+#include "../core/camera.h"
 
- ///////////////////////////////////////////////////////////////////////////
- // Pinhole                                                               //
- ///////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////
+// Pinhole                                                               //
+///////////////////////////////////////////////////////////////////////////
 
 class Pinhole : public Camera
 {
 public:
     Pinhole(glm::vec3 origin, glm::vec3 lookAt, glm::vec3 vup, float hfov, float aspectRatio);
-
+    
     ~Pinhole() = default;
 
-    Ray getRay(float s, float t) const;
+    Ray getRay(float u, float v) const;
 
     void printCamera();
-
+    
 private:
 
 };

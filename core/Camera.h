@@ -13,6 +13,7 @@
 
 #include "../common/glm_common.h"
 #include "../common/math.h"
+#include "ray.h"
 
 ///////////////////////////////////////////////////////////////////////////
 // Camera                                                                //
@@ -27,6 +28,8 @@ public:
 
     virtual void printCamera() = 0;
 
+    virtual Ray getRay(float u, float v) const = 0;
+    
 protected:
     glm::vec3 m_origin;
     glm::vec3 m_lowerLeftCorner;
@@ -34,5 +37,6 @@ protected:
     glm::vec3 m_horizontal;
     glm::vec3 m_vertical;
 };
-
+ 
 #endif // !CAMERA_H_
+

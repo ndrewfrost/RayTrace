@@ -7,13 +7,13 @@
 
 #include "pinhole.h"
 
- ///////////////////////////////////////////////////////////////////////////
- // Pinhole                                                               //
- ///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+// Pinhole                                                               //
+///////////////////////////////////////////////////////////////////////////
 
- //-------------------------------------------------------------------------
- //
- //
+//-------------------------------------------------------------------------
+//
+//
 Pinhole::Pinhole(glm::vec3 origin, glm::vec3 lookAt, glm::vec3 vup, float hfov, float aspectRatio)
     : Camera(origin, lookAt, vup, hfov, aspectRatio)
 {
@@ -22,9 +22,9 @@ Pinhole::Pinhole(glm::vec3 origin, glm::vec3 lookAt, glm::vec3 vup, float hfov, 
 //-------------------------------------------------------------------------
 //
 //
-Ray Pinhole::getRay(float s, float t) const
+Ray Pinhole::getRay(float u, float v) const
 {
-    return Ray(m_origin, m_lowerLeftCorner + (s * m_horizontal) + (t * m_vertical) - m_origin);
+    return Ray(m_origin, m_lowerLeftCorner + u * m_horizontal + v * m_vertical - m_origin);
 }
 
 //-------------------------------------------------------------------------
@@ -32,8 +32,10 @@ Ray Pinhole::getRay(float s, float t) const
 //
 void Pinhole::printCamera()
 {
-    std::cout << "Pinhole Camera" << std::endl;
+    std::cout << "Pinhole Camera"<< std::endl;
     std::cout << "origin     : " << vecToString(m_origin) << std::endl;
 }
+
+
 
 
