@@ -49,7 +49,8 @@ int main(int argc, char** argv) {
 
     // generate a camera
     assert(doc.HasMember("camera") && "Input Json must have member camera");
-    unique_ptr<Camera> camera = Parser::readCamera(doc["camera"]);
+    float aspectRatio = static_cast<float>(g_width) / static_cast<float>(g_height);
+    unique_ptr<Camera> camera = Parser::readCamera(doc["camera"], aspectRatio);
 
     // generate the scene
     unique_ptr<Scene> scene = Parser::readScene(doc["scene"]);

@@ -1,10 +1,3 @@
-/*
- * parser.cpp
- * Andrew Frost
- * 2020
- *
- */
-
 #include "parser.h"
 
 ///////////////////////////////////////////////////////////////////////////
@@ -15,12 +8,12 @@
 // Create a camera object, either Pinhole or Thin lens
 // Depending on the data from JSON in Value& CameraSpecs
 //
-std::unique_ptr<Camera> Parser::readCamera(Value& value)
+std::unique_ptr<Camera> Parser::readCamera(Value& value, float aspectRatio)
 {
     // check if defined cameratype
     assert(value.HasMember("type") && "Camera type not specified");
 
-    const std::string cameraType = readString(value["type"], "Camera type");
+    const std::string cameraType = readString(value["type"], "Camera type"); 
 
     // Pinhole Camera
     if (cameraType == "pinhole") {
@@ -29,16 +22,6 @@ std::unique_ptr<Camera> Parser::readCamera(Value& value)
         glm::vec3 lookAt  = readVector(value["lookat"], "Camera lookAt");
         glm::vec3 vup     = readVector(value["vup"], "Camera vup");
         float hfov        = readFloat(value["hfov"], "Camera hfov");
-
-        std::vector<float> values;
-        for (auto& v : value["ratio"].GetArray()) {
-            assert(v.IsFloat() && ("ratio: vector values must all be floats"));
-            values.push_back(v.GetFloat());
-        }
-        if (values.size() != 2)
-            std::cerr << "ratio: vector size must be 2" << std::endl;
-
-        float aspectRatio = values[0] / values[1];
 
         return std::make_unique<Pinhole>(Pinhole(origin, lookAt, vup, hfov, aspectRatio));
     }
