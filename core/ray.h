@@ -8,11 +8,15 @@
 #ifndef RAY_H_
 #define RAY_H_
 
-#include "../common/glm_common.h"
+#include "../common/math.h"
+#include <memory>
 
- ///////////////////////////////////////////////////////////////////////////
- // Ray                                                                   //
- ///////////////////////////////////////////////////////////////////////////
+using std::shared_ptr;
+class Material;
+
+///////////////////////////////////////////////////////////////////////////
+// Ray                                                                   //
+///////////////////////////////////////////////////////////////////////////
 
 class Ray
 {
@@ -33,6 +37,26 @@ public:
     glm::vec3 m_origin;
     glm::vec3 m_direction;
 };
+
+///////////////////////////////////////////////////////////////////////////
+// HitRecord                                                             //
+///////////////////////////////////////////////////////////////////////////
+
+struct HitRecord
+{
+    float t;
+    bool frontFace;
+    glm::vec3 point;
+    glm::vec3 normal;
+    shared_ptr<Material> material;
+
+    inline void setFaceNormal(const Ray& ray, const glm::vec3& outNormal)
+    {
+        frontFace = glm::dot(ray.direction(), outNormal) < 0;
+        normal = frontFace ? outNormal : -outNormal;
+    }
+};
+
 
 #endif // !RAY_H_
 

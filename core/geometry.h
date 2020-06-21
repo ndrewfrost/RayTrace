@@ -14,27 +14,6 @@
 #include "material.h"
 #include "ray.h"
 
-using std::shared_ptr;
-
-///////////////////////////////////////////////////////////////////////////
-// HitRecord                                                             //
-///////////////////////////////////////////////////////////////////////////
-
-struct HitRecord
-{
-    float t;
-    bool frontFace;
-    glm::vec3 point;
-    glm::vec3 normal;        
-    shared_ptr<Material> material;
-
-    inline void setFaceNormal(const Ray & ray, const glm::vec3 & outNormal)
-    {
-        frontFace = glm::dot(ray.direction(), outNormal) < 0;
-        normal = frontFace ? outNormal : -outNormal;
-    }
-};
-
 ///////////////////////////////////////////////////////////////////////////
 // Geometry                                                              //
 ///////////////////////////////////////////////////////////////////////////
