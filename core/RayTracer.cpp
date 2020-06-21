@@ -14,9 +14,9 @@
  //-------------------------------------------------------------------------
  // Constructor
  //
-RayTracer::RayTracer(std::shared_ptr<Camera>       camera,
-    std::shared_ptr<Scene>        scene,
-    std::shared_ptr<DisplayImage> output)
+RayTracer::RayTracer(std::shared_ptr<Camera> camera,
+    std::shared_ptr<Scene>                   scene,
+    std::shared_ptr<DisplayImage>            output)
 {
     m_camera = camera;
     m_scene = scene;
