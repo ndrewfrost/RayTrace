@@ -1,16 +1,27 @@
 {
+  "global": {
+    "width"  : 500,
+    "height" : 500,
+    "samples": 10
+  },
   "camera": {
     "type"   : "pinhole",
-    "origin" : [ 0.2, 1.5, 0.2],
+    "origin" : [ 0.0, 0.0,  0.6],
     "lookat" : [ 0.0, 0.0, -1.0],
-    "vup"    : [ 0.0, 1.0, 0.0],
+    "vup"    : [ 0.0, 1.0,  0.0],
     "hfov"   : 90.0 
   },
   "scene": {
-    "geometry": [
-      { "type": "sphere", "center": [ 0.0, 0.0, -1.0 ], "radius": 0.5 },
-      { "type": "sphere", "center": [ 0.0, 0.7, -1.0 ], "radius": 0.2 },
-      { "type": "sphere", "center": [ -1.0, 0.0, -1.0 ], "radius": 0.5 }
+    "lights"   : [],
+    "materials": [
+      { "name" :  "diel" , "type" :  "dielectric", "ri" :  1.5 },
+      { "name" :  "material01", "type" : "lambertian", "color" : [0.7, 0.3, 0.3] }
+    ],
+    "geometry" : [
+      { "type": "sphere", "center": [  0.0,  0.0,   -1.0 ], "radius": 0.5, "material" : {"type" : "normal"} },
+      { "type": "sphere", "center": [  1.0,  0.0,   -1.0 ], "radius": 0.5, "material" : "diel" },
+      { "type": "sphere", "center": [ -1.0,  0.0,   -1.0 ], "radius": 0.5, "material" : {"type" : "lambertian", "color" : [0.8, 0.8, 0.0]} },
+      { "type": "sphere", "center": [  0.0, -100.5, -1.0 ], "radius": 100, "material" : "material01" }
     ]
   }
 }
