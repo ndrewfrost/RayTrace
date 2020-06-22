@@ -10,9 +10,9 @@
 
 #include "../core/material.h"
 
-///////////////////////////////////////////////////////////////////////////
-// BlinnPhong                                                            //
-///////////////////////////////////////////////////////////////////////////
+ ///////////////////////////////////////////////////////////////////////////
+ // BlinnPhong                                                            //
+ ///////////////////////////////////////////////////////////////////////////
 
 class BlinnPhong : public Material
 {
@@ -22,13 +22,34 @@ public:
 
     ~BlinnPhong() = default;
 
-    virtual bool scatter(const Ray& rayIn, Ray& rayOut, 
+    virtual bool scatter(const Ray& rayIn, Ray& rayOut,
         glm::vec3& attenuation, const HitRecord& hitRecord) const
     {
         glm::vec3 dirOut = hitRecord.normal + rndPointUnitSphere();
         rayOut = Ray(hitRecord.point, dirOut);
-        attenuation = m_diffuseColor;
+        attenuation = getAmbient() + getDiffuse() + getSpecular();
         return true;
+    }
+
+private:
+
+    glm::vec3 getAmbient() const
+    {
+        return 0.08f * m_diffuseColor;
+    }
+
+    glm::vec3 getDiffuse() const
+    {
+        glm::vec3 diffuse = glm::vec3(0, 0, 0);
+
+        return diffuse;
+    }
+
+    glm::vec3 getSpecular() const
+    {
+        glm::vec3 specular = glm::vec3(0, 0, 0);
+
+        return specular;
     }
 
 private:
