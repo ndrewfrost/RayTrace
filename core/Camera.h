@@ -22,6 +22,7 @@
 class Camera
 {
 public:
+    Camera() = default;
     Camera(glm::vec3 origin, glm::vec3 lookAt, glm::vec3 vup, float hfov, float aspectRatio);
 
     virtual ~Camera() = default;

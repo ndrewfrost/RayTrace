@@ -19,7 +19,8 @@
 class Pinhole : public Camera
 {
 public:
-    Pinhole(glm::vec3 origin, glm::vec3 lookAt, glm::vec3 vup, float hfov, float aspectRatio);
+    Pinhole(glm::vec3 origin, glm::vec3 lookAt, glm::vec3 vup, float hfov, float aspectRatio)
+        : Camera(origin, lookAt, vup, hfov, aspectRatio) {}
     
     ~Pinhole() = default;
 
