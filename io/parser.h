@@ -17,6 +17,7 @@
 
 #include "../core/camera.h"
 #include "../cameras/pinhole.h"
+#include "../cameras/thinlens.h"
 
 #include "../core/geometry.h"
 #include "../geometry/sphere.h"

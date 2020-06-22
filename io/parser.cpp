@@ -13,22 +13,29 @@ std::unique_ptr<Camera> Parser::readCamera(Value& value, float aspectRatio)
     // check if defined cameratype
     assert(value.HasMember("type") && "Camera type not specified");
 
-    const std::string cameraType = readString(value["type"], "Camera type");
+    const std::string cameraType = readString(value["type"], "Camera type"); 
 
     // Pinhole Camera
     if (cameraType == "pinhole") {
 
-        glm::vec3 origin = readVector(value["origin"], "Camera origin");
-        glm::vec3 lookAt = readVector(value["lookat"], "Camera lookAt");
-        glm::vec3 vup = readVector(value["vup"], "Camera vup");
-        float hfov = readFloat(value["hfov"], "Camera hfov");
+        glm::vec3 origin  = readVector(value["origin"], "Camera origin");
+        glm::vec3 lookAt  = readVector(value["lookat"], "Camera lookAt");
+        glm::vec3 vup     = readVector(value["vup"], "Camera vup");
+        float hfov        = readFloat(value["hfov"], "Camera hfov");
 
         return std::make_unique<Pinhole>(Pinhole(origin, lookAt, vup, hfov, aspectRatio));
     }
     // Thin lens Camera
     else if (cameraType == "thinlens") {
-        std::cerr << "[thinlens] is yet to be implemented" << std::endl;
-        exit(-1);
+
+        glm::vec3 origin = readVector(value["origin"], "Camera origin");
+        glm::vec3 lookAt = readVector(value["lookat"], "Camera lookAt");
+        glm::vec3 vup    = readVector(value["vup"], "Camera vup");
+        float hfov       = readFloat(value["hfov"], "Camera hfov");
+        float focalDist  = readFloat(value["focaldistance"], "Camera focal distance");
+        float aperture   = readFloat(value["aperture"], "Camera aperture");
+
+        return std::make_unique<ThinLens>(ThinLens(origin, lookAt, vup, hfov, aspectRatio, aperture, focalDist));
     }
     // Error
     else {
@@ -41,7 +48,7 @@ std::unique_ptr<Camera> Parser::readCamera(Value& value, float aspectRatio)
 // Read and generate the world geometry
 //
 std::unique_ptr<Scene> Parser::readScene(Value& value)
-{
+{    
     std::vector<std::shared_ptr<Geometry>> sceneGeometry;
     MaterialList sceneMaterials;
 
@@ -63,8 +70,8 @@ std::unique_ptr<Scene> Parser::readScene(Value& value)
 //
 void Parser::storeMaterial(MaterialList& sceneMaterials, Value& material)
 {
-    assert(material.HasMember("name") && "defined materials must have members : [name]");
-    assert(material.HasMember("type") && "defined materials must have members : [type]");
+    assert(material.HasMember("name")  && "defined materials must have members : [name]");
+    assert(material.HasMember("type")  && "defined materials must have members : [type]");
 
     std::string name = readString(material["name"], "material name");
     std::string type = readString(material["type"], "material name");
@@ -117,7 +124,7 @@ std::shared_ptr<Material> Parser::readMaterial(Value& material)
 
     std::string type = readString(material["type"], "material type");
 
-    // Material == Normal,  Special Case
+    // Material == Normal
     if (type == "normal") {
         return std::make_shared<Normal>();
     }
@@ -130,6 +137,15 @@ std::shared_ptr<Material> Parser::readMaterial(Value& material)
     else if (type == "dielectric") {
         float ri = readFloat(material["ri"], "dielectric ri");
         return std::make_shared<Dielectric>(ri);
+    }
+    // Material == BlinnPhong
+    else if (type == "blinnphong") {
+        glm::vec3 color = readVector(material["color"], "material color");
+        float ks = readFloat(material["ks"], "material ks");
+        float kd = readFloat(material["kd"], "material kd");
+        float kr = readFloat(material["kr"], "material kr");
+        float specExp = readFloat(material["specularexp"], "material specular exp");
+        return std::make_shared<BlinnPhong>(ks, kd, kr, specExp, color);
     }
     else {
         std::cerr << "error existing material type is called: " << type << std::endl;
