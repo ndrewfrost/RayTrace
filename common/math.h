@@ -12,7 +12,6 @@
 #include <random>
 #include <string>
 
-
 constexpr float infinity = std::numeric_limits<float>::infinity();
 constexpr float PI = 3.14159265f;
 
@@ -56,7 +55,7 @@ inline float randomFloat()
 //
 inline float randomFloat(float min, float max)
 {
-    return min + (max-min) * randomFloat();
+    return min + (max - min) * randomFloat();
 }
 
 //-------------------------------------------------------------------------
@@ -72,9 +71,9 @@ inline glm::vec3 randomVec3()
 //
 inline glm::vec3 randomVec3(float min, float max)
 {
-    return glm::vec3(randomFloat(min, max), 
-                     randomFloat(min, max), 
-                     randomFloat(min, max));
+    return glm::vec3(randomFloat(min, max),
+        randomFloat(min, max),
+        randomFloat(min, max));
 }
 
 //-------------------------------------------------------------------------
@@ -84,6 +83,18 @@ inline glm::vec3 rndPointUnitSphere()
 {
     while (true) {
         glm::vec3 point = randomVec3(-1.0f, 1.f);
+        if (glm::dot(point, point) >= 1) continue;
+        return point;
+    }
+}
+
+//-------------------------------------------------------------------------
+// Generate a point in a unit disk (A rejection method)
+//
+inline glm::vec2 rndPointUnitDisk()
+{
+    while (true) {
+        glm::vec2 point(randomFloat(), randomFloat());
         if (glm::dot(point, point) >= 1) continue;
         return point;
     }
