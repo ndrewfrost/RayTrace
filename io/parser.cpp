@@ -112,14 +112,37 @@ std::shared_ptr<Geometry> Parser::readGeometry(Value& geometry, MaterialList& sc
         std::shared_ptr<Sphere> sphere = std::make_shared<Sphere>(Sphere(center, radius, material));
         return sphere;
     }
+    // Planar Quad
+    else if (readString(geometry["type"], "Geometry type") == "plane") {
+        glm::vec3 center = readVector(geometry["center"], "Plane center");
+        glm::vec3 rotation = readVector(geometry["rot"], "Plane rotation");
+        float width = readFloat(geometry["width"], "Plane width");
+        float height = readFloat(geometry["height"], "Plane height");
 
-    // Triangle TODO
+        return std::make_shared<Plane>(Plane(center, width, height, rotation, material));
+    }
+    // Box
+    else if (readString(geometry["type"], "Geometry type") == "box") {
+        glm::vec3 center = readVector(geometry["center"], "Box center");
+        glm::vec3 rotation = readVector(geometry["rot"], "Box rotation");
+        float width = readFloat(geometry["width"], "Box width");
+        float height = readFloat(geometry["height"], "Box height");
+        float depth = readFloat(geometry["depth"], "Box depth");
 
-    // Quad TODO
+        return std::make_shared<Box>(Box(center, width, height, depth, rotation, material));
+    }
+    // Cone 
+    else if (readString(geometry["type"], "Geometry type") == "cone") {
 
-    //TriMesh TODO
+    }
+    // Mesh
+    else if (readString(geometry["type"], "Geometry type") == "mesh") {
 
-    return std::shared_ptr<Geometry>();
+    }
+    else {
+        std::cerr << "error Geometry type [ " << geometry["type"].GetString() << " ] doesn't exist" << std::endl;
+        exit(-1);
+    }
 }
 
 //-------------------------------------------------------------------------
