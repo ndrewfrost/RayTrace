@@ -9,8 +9,7 @@ Simple ray tracer, basic materials, thin lens, basic shapes, lights
 ![Example Image](examples/example.JPG)
 
 TODO:
-advanced materials, extended sampling, TriMesh,
-light sampling
+advanced materials, extended sampling, TriMesh, light sampling, BssrDF, MLT
 
 ## Third-Party Dependencies
 
