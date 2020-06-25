@@ -51,11 +51,23 @@ inline float randomFloat()
 }
 
 //-------------------------------------------------------------------------
+// returns int [min,max]
+//
+inline int randomInt(int min, int max)
+{
+    std::random_device rdevice; 
+    std::mt19937 generator(rdevice());
+    std::uniform_int_distribution<> distribution(min, max);
+
+    return distribution(generator);
+}
+
+//-------------------------------------------------------------------------
 // returns a float within a range [min, max)
 //
 inline float randomFloat(float min, float max)
 {
-    return min + (max - min) * randomFloat();
+    return min + (max-min) * randomFloat();
 }
 
 //-------------------------------------------------------------------------
@@ -71,9 +83,9 @@ inline glm::vec3 randomVec3()
 //
 inline glm::vec3 randomVec3(float min, float max)
 {
-    return glm::vec3(randomFloat(min, max),
-        randomFloat(min, max),
-        randomFloat(min, max));
+    return glm::vec3(randomFloat(min, max), 
+                     randomFloat(min, max), 
+                     randomFloat(min, max));
 }
 
 //-------------------------------------------------------------------------
@@ -101,11 +113,20 @@ inline glm::vec2 rndPointUnitDisk()
 }
 
 //-------------------------------------------------------------------------
+// Rotate around axis, X then Y then Z
+//
+inline glm::vec3 rotate(glm::vec3 point, glm::vec3 rotation) {
+    return glm::rotateZ(glm::rotateY(glm::rotateX(point, glm::radians(rotation.x)), glm::radians(rotation.y)), glm::radians(rotation.z));
+}
+
+//-------------------------------------------------------------------------
 // Vec3 to string
 //
 inline std::string vecToString(glm::vec3 vec)
 {
     return std::to_string(vec.x) + " " + std::to_string(vec.y) + " " + std::to_string(vec.z);
 }
+
+
 
 #endif // !MATH_HELP_H_
