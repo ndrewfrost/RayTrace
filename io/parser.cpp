@@ -49,19 +49,26 @@ std::unique_ptr<Camera> Parser::readCamera(Value& value, float aspectRatio)
 //
 std::unique_ptr<Scene> Parser::readScene(Value& value)
 {    
-    std::vector<std::shared_ptr<Geometry>> sceneGeometry;
-    MaterialList sceneMaterials;
+    std::vector<std::shared_ptr<Light>>     sceneLights;
+    std::vector<std::shared_ptr<AreaLight>> sceneAreaLights;
+
+    std::vector<std::shared_ptr<Geometry>>  sceneGeometry;
+    MaterialList                            sceneMaterials;
 
     Value& materials = value["materials"];
-    for (unsigned int i = 0; i < materials.Size(); i++) {
+    for (unsigned int i = 0; i < materials.Size(); ++i) {
         storeMaterial(sceneMaterials, materials[i]);
     }
 
     Value& geometry = value["geometry"];
-    for (unsigned int i = 0; i < geometry.Size(); i++) {
-        sceneGeometry.push_back(readGeometry(geometry[i], sceneMaterials));
+    for (unsigned int i = 0; i < geometry.Size(); ++i) {
+        sceneGeometry.push_back(readGeometry(geometry[i], &sceneMaterials));
     }
 
+    Value& lights = value["lights"];
+    for (unsigned int i = 0; i < lights.Size(); ++i) {
+        sceneLights.push_back(readLight(lights[i]));
+    }
     return std::make_unique<Scene>(Scene(sceneGeometry));
 }
 
@@ -149,6 +156,60 @@ std::shared_ptr<Material> Parser::readMaterial(Value& material)
     }
     else {
         std::cerr << "error existing material type is called: " << type << std::endl;
+        exit(-1);
+    }
+}
+
+//-------------------------------------------------------------------------
+// Read and generate a light
+//
+std::shared_ptr<Light> Parser::readLight(Value& light)
+{
+    assert(light.HasMember("type") && "lights must have member: [type]");
+    std::string type = readString(light["type"], "light type");
+
+    // Light == area 
+    if (type == "area") {
+        assert(light.HasMember("geometry") && "area lights must have member: [geometry]");
+        glm::vec3 color = readVector(light["color"], "area light color");
+        float intensity = readFloat(light["intensity"], "area light intensity");
+        std::shared_ptr<Geometry> shape = readGeometry(light["geometry"]);
+
+        return std::make_shared<AreaLight>(shape, color, intensity);
+    }
+    // Light == distant
+    else if (type == "distant") {
+        glm::vec3 direction = readVector(light["direction"], "distant light direction");
+        glm::vec3 color = readVector(light["color"], "distant light color");
+        float intensity = readFloat(light["intensity"], "distant light intensity");
+
+        return std::make_shared<DistantLight>(direction, color, intensity);
+    }
+    // Light == infinite TODO
+    else if (type == "infinite") {
+        return std::make_shared<InfiniteAreaLight>();
+    }
+    // Light == point
+    else if (type == "point") {
+        glm::vec3 position = readVector(light["pos"], "point light pos");
+        glm::vec3 color = readVector(light["color"], "point light color");
+        float intensity = readFloat(light["intensity"], "point light intensity");
+
+        return std::make_shared<PointLight>(position, color, intensity);
+    }
+    // Light == spotlight
+    else if (type == "spotlight") {
+        glm::vec3 position = readVector(light["pos"], "spotlight pos");
+        glm::vec3 direction = readVector(light["direction"], "spotlight direction");
+        glm::vec3 color = readVector(light["color"], "spotlight color");
+        float radius = readFloat(light["radius"], "spotlight radius");
+        float intensity = readFloat(light["intensity"], "spotlight intensity");
+
+        return std::make_shared<SpotLight>(position, direction, color, intensity, radius);
+    }
+    // Error
+    else {
+        std::cerr << "error light type [ " << type << " ] doesn't exist" << std::endl;
         exit(-1);
     }
 }

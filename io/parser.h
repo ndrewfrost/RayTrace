@@ -14,6 +14,11 @@
 #include <unordered_map>
 
 #include "../core/light.h"
+#include "../lights/area.h"
+#include "../lights/distant.h"
+#include "../lights/infinitearea.h"
+#include "../lights/spotlight.h"
+#include "../lights/point.h"
 
 #include "../core/camera.h"
 #include "../cameras/pinhole.h"
@@ -21,6 +26,11 @@
 
 #include "../core/geometry.h"
 #include "../geometry/sphere.h"
+#include "../geometry/triangle.h"
+#include "../geometry/plane.h"
+#include "../geometry/cone.h"
+#include "../geometry/mesh.h"
+#include "../geometry/box.h"
 #include "../core/scene.h"
 
 #include "../core/material.h"
@@ -28,6 +38,8 @@
 #include "../materials/dielectric.h"
 #include "../materials/lambertian.h"
 #include "../materials/blinnphong.h"
+#include "../materials/disney.h"
+#include "../materials/gooch.h"
 
 #include "rapidjson/document.h"
 using namespace rapidjson;
@@ -47,9 +59,11 @@ public:
 
     static void storeMaterial(MaterialList& sceneMaterials, Value& material);
 
+    static std::shared_ptr<Geometry> readGeometry(Value& geometry, MaterialList* sceneMaterials);
+    
     static std::shared_ptr<Material> readMaterial(Value& materials);
 
-    static std::shared_ptr<Geometry> readGeometry(Value& geometry, MaterialList& sceneMaterials);
+    static std::shared_ptr<Light> readLight(Value& light);
 
     static glm::vec3 readVector(Value& value, std::string jsonLoc);
 
@@ -57,7 +71,5 @@ public:
 
     static std::string readString(Value& value, std::string jsonLoc);
 };
-
-
 
 #endif // !PARSER_H_
