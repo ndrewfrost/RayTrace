@@ -1,22 +1,31 @@
 /*
  * light.h
  * Andrew Frost
- * December 2019
+ * 2020
  *
  */
 
 #ifndef LIGHT_H_
 #define LIGHT_H_
 
-namespace rt {
+#include "../common/math.h"
 
-    class Light {
-    public:
-        Light();
-        ~Light();
-    protected:
-    };
+///////////////////////////////////////////////////////////////////////////
+// Light                                                                 //
+///////////////////////////////////////////////////////////////////////////
 
-} // namespace rt
+class Light {
+
+public:
+    Light() = default;
+     
+    ~Light() = default;
+    
+    virtual glm::vec3 sampleLight(glm::vec3 dest) = 0;
+
+protected:
+
+};
+
 
 #endif // !LIGHT_H_
