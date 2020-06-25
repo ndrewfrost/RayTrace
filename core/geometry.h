@@ -26,6 +26,8 @@ public:
     virtual ~Geometry() = default;
 
     virtual bool intersect(const Ray & ray, float tMin, float tMax, HitRecord& record) = 0;
+
+    virtual bool boundingBox(aabb& bBox) = 0;
 };
 
 
