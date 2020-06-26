@@ -74,3 +74,27 @@ bool Plane::intersect(const Ray& ray, float tMin, float tMax, HitRecord& record)
 
     return false;
 }
+
+//-------------------------------------------------------------------------
+// gen Bounding box
+//
+bool Plane::boundingBox(aabb& bBox)
+{
+    float xmin = m_v0.x < m_v1.x ? (m_v0.x < m_v2.x ? (m_v0.x < m_v3.x ? m_v0.x : m_v3.x) : m_v2.x)
+        : (m_v1.x < m_v2.x ? (m_v1.x < m_v3.x ? m_v1.x : m_v3.x) : m_v2.x);
+    float ymin = m_v0.y < m_v1.y ? (m_v0.y < m_v2.y ? (m_v0.y < m_v3.y ? m_v0.y : m_v3.y) : m_v2.y)
+        : (m_v1.y < m_v2.y ? (m_v1.y < m_v3.y ? m_v1.y : m_v3.y) : m_v2.y);
+    float zmin = m_v0.z < m_v1.z ? (m_v0.z < m_v2.z ? (m_v0.z < m_v3.z ? m_v0.z : m_v3.z) : m_v2.z)
+        : (m_v1.z < m_v2.z ? (m_v1.z < m_v3.z ? m_v1.z : m_v3.z) : m_v2.z);
+
+    float xmax = m_v0.x > m_v1.x ? (m_v0.x > m_v2.x ? (m_v0.x > m_v3.x ? m_v0.x : m_v3.x) : m_v2.x)
+        : (m_v1.x > m_v2.x ? (m_v1.x > m_v3.x ? m_v1.x : m_v3.x) : m_v2.x);
+    float ymax = m_v0.y > m_v1.y ? (m_v0.y > m_v2.y ? (m_v0.y > m_v3.y ? m_v0.y : m_v3.y) : m_v2.y)
+        : (m_v1.y > m_v2.y ? (m_v1.y > m_v3.y ? m_v1.y : m_v3.y) : m_v2.y);
+    float zmax = m_v0.z > m_v1.z ? (m_v0.z > m_v2.z ? (m_v0.z > m_v3.z ? m_v0.z : m_v3.z) : m_v2.z)
+        : (m_v1.z > m_v2.z ? (m_v1.z > m_v3.z ? m_v1.z : m_v3.z) : m_v2.z);
+
+    bBox = aabb(glm::vec3(xmin, ymin, zmin),
+        glm::vec3(xmax, ymax, zmax));
+    return true;
+}

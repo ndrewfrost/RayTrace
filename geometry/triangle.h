@@ -30,11 +30,12 @@ public:
 
     virtual bool intersect(const Ray& ray, float tMin, float tMax, HitRecord& record);
 
+    virtual bool boundingBox(aabb& bBox);
+
 private:
     glm::vec3 m_v0, m_v1, m_v2;
-    glm::vec3 m_n0, m_n1, m_n2;
+    glm::vec3 m_n0, m_n1, m_n2; // TODO
     glm::vec3 m_faceNormal;
-    glm::vec3 m_center;
 
     shared_ptr<Material> m_material;
 };

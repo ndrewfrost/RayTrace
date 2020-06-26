@@ -24,6 +24,8 @@ public:
 
     virtual bool intersect(const Ray& ray, float tMin, float tMax, HitRecord& record);
     
+    virtual bool boundingBox(aabb& bBox);
+
 private:
     glm::vec3 m_v0, m_v1, m_v2, m_v3;
     glm::vec3 m_normal;

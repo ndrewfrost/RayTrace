@@ -53,3 +53,13 @@ bool Sphere::intersect(const Ray& ray, float tMin, float tMax, HitRecord& record
     return false;
 
 }
+
+//-------------------------------------------------------------------------
+// Generate a BBox for sphere
+//
+bool Sphere::boundingBox(aabb& bBox)
+{
+    bBox = aabb(m_center - glm::vec3(m_radius, m_radius, m_radius),
+        m_center + glm::vec3(m_radius, m_radius, m_radius));
+    return true;
+}
