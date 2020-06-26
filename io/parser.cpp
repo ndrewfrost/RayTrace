@@ -5,23 +5,42 @@
 ///////////////////////////////////////////////////////////////////////////
 
 //-------------------------------------------------------------------------
+//
+//
+std::shared_ptr<Settings> Parser::readSettings(Value& value)
+{
+    assert(value.HasMember("width") && "Must specify [width] setting");
+    assert(value.HasMember("height") && "Must specify [height] setting");
+    assert(value.HasMember("samples") && "Must specify [samples] setting");
+
+    unsigned int width = value["width"].GetInt();
+    unsigned int height = value["height"].GetInt();
+    unsigned int samples = value["samples"].GetInt();
+    bool bvh = value["bvh"].GetBool();
+
+    return std::make_shared<Settings>(width, height, samples, bvh);
+}
+
+//-------------------------------------------------------------------------
 // Create a camera object, either Pinhole or Thin lens
 // Depending on the data from JSON in Value& CameraSpecs
 //
-std::unique_ptr<Camera> Parser::readCamera(Value& value, float aspectRatio)
+std::unique_ptr<Camera> Parser::readCamera(Value& value, std::shared_ptr<Settings> settings)
 {
     // check if defined cameratype
     assert(value.HasMember("type") && "Camera type not specified");
 
-    const std::string cameraType = readString(value["type"], "Camera type"); 
+    const std::string cameraType = readString(value["type"], "Camera type");
+
+    float aspectRatio = static_cast<float>(settings->width) / static_cast<float>(settings->height);
 
     // Pinhole Camera
     if (cameraType == "pinhole") {
 
-        glm::vec3 origin  = readVector(value["origin"], "Camera origin");
-        glm::vec3 lookAt  = readVector(value["lookat"], "Camera lookAt");
-        glm::vec3 vup     = readVector(value["vup"], "Camera vup");
-        float hfov        = readFloat(value["hfov"], "Camera hfov");
+        glm::vec3 origin = readVector(value["origin"], "Camera origin");
+        glm::vec3 lookAt = readVector(value["lookat"], "Camera lookAt");
+        glm::vec3 vup = readVector(value["vup"], "Camera vup");
+        float hfov = readFloat(value["hfov"], "Camera hfov");
 
         return std::make_unique<Pinhole>(Pinhole(origin, lookAt, vup, hfov, aspectRatio));
     }
@@ -30,10 +49,10 @@ std::unique_ptr<Camera> Parser::readCamera(Value& value, float aspectRatio)
 
         glm::vec3 origin = readVector(value["origin"], "Camera origin");
         glm::vec3 lookAt = readVector(value["lookat"], "Camera lookAt");
-        glm::vec3 vup    = readVector(value["vup"], "Camera vup");
-        float hfov       = readFloat(value["hfov"], "Camera hfov");
-        float focalDist  = readFloat(value["focaldistance"], "Camera focal distance");
-        float aperture   = readFloat(value["aperture"], "Camera aperture");
+        glm::vec3 vup = readVector(value["vup"], "Camera vup");
+        float hfov = readFloat(value["hfov"], "Camera hfov");
+        float focalDist = readFloat(value["focaldistance"], "Camera focal distance");
+        float aperture = readFloat(value["aperture"], "Camera aperture");
 
         return std::make_unique<ThinLens>(ThinLens(origin, lookAt, vup, hfov, aspectRatio, aperture, focalDist));
     }
@@ -47,8 +66,8 @@ std::unique_ptr<Camera> Parser::readCamera(Value& value, float aspectRatio)
 //-------------------------------------------------------------------------
 // Read and generate the world geometry
 //
-std::unique_ptr<Scene> Parser::readScene(Value& value)
-{    
+std::unique_ptr<Scene> Parser::readScene(Value& value, std::shared_ptr<Settings> settings)
+{
     std::vector<std::shared_ptr<Light>>     sceneLights;
     std::vector<std::shared_ptr<AreaLight>> sceneAreaLights;
 
@@ -69,7 +88,16 @@ std::unique_ptr<Scene> Parser::readScene(Value& value)
     for (unsigned int i = 0; i < lights.Size(); ++i) {
         sceneLights.push_back(readLight(lights[i]));
     }
-    return std::make_unique<Scene>(Scene(sceneGeometry));
+
+    // If using BVH load it here
+    if (settings->bvh) {
+        std::vector<std::shared_ptr<Geometry>> BVH;
+        BVH.push_back(std::make_shared<BVHNode>(BVHNode(sceneGeometry, 0, sceneGeometry.size())));
+        return std::make_unique<Scene>(Scene(BVH, sceneLights, sceneAreaLights));
+    }
+    else {
+        return std::make_unique<Scene>(Scene(sceneGeometry, sceneLights, sceneAreaLights));
+    }
 }
 
 //-------------------------------------------------------------------------
@@ -77,8 +105,8 @@ std::unique_ptr<Scene> Parser::readScene(Value& value)
 //
 void Parser::storeMaterial(MaterialList& sceneMaterials, Value& material)
 {
-    assert(material.HasMember("name")  && "defined materials must have members : [name]");
-    assert(material.HasMember("type")  && "defined materials must have members : [type]");
+    assert(material.HasMember("name") && "defined materials must have members : [name]");
+    assert(material.HasMember("type") && "defined materials must have members : [type]");
 
     std::string name = readString(material["name"], "material name");
     std::string type = readString(material["type"], "material name");
@@ -89,19 +117,22 @@ void Parser::storeMaterial(MaterialList& sceneMaterials, Value& material)
 //-------------------------------------------------------------------------
 // Generate a geometry primitive
 //
-std::shared_ptr<Geometry> Parser::readGeometry(Value& geometry, MaterialList& sceneMaterials)
+std::shared_ptr<Geometry> Parser::readGeometry(Value& geometry, MaterialList* sceneMaterials = nullptr)
 {
     assert(geometry.HasMember("type") && "geometry must have type member");
 
     // Geometry material
-    std::shared_ptr<Material> material;
-    // Retrieve from scene materials
-    if (geometry["material"].IsString()) {
-        material = sceneMaterials.at(readString(geometry["material"], "geometry material"));
-    }
-    // generate a new material
-    else {
-        material = readMaterial(geometry["material"]);
+    std::shared_ptr<Material> material = nullptr;
+
+    if (sceneMaterials) {
+        // Retrieve from scene materials
+        if (geometry["material"].IsString()) {
+            material = sceneMaterials->at(readString(geometry["material"], "geometry material"));
+        }
+        // generate a new material
+        else {
+            material = readMaterial(geometry["material"]);
+        }
     }
 
     // Sphere
@@ -109,8 +140,16 @@ std::shared_ptr<Geometry> Parser::readGeometry(Value& geometry, MaterialList& sc
         glm::vec3 center = readVector(geometry["center"], "Sphere Center");
         float radius = readFloat(geometry["radius"], "Sphere Radius");
 
-        std::shared_ptr<Sphere> sphere = std::make_shared<Sphere>(Sphere(center, radius, material));
-        return sphere;
+        return std::make_shared<Sphere>(Sphere(center, radius, material));
+    }
+
+    // Triangle
+    else if (readString(geometry["type"], "Geometry type") == "triangle") {
+        glm::vec3 v0 = readVector(geometry["v0"], "Triangle v0");
+        glm::vec3 v1 = readVector(geometry["v1"], "Triangle v1");
+        glm::vec3 v2 = readVector(geometry["v2"], "Triangle v2");
+
+        return std::make_shared<Triangle>(Triangle(v0, v1, v2, material));
     }
     // Planar Quad
     else if (readString(geometry["type"], "Geometry type") == "plane") {
@@ -150,8 +189,7 @@ std::shared_ptr<Geometry> Parser::readGeometry(Value& geometry, MaterialList& sc
 //
 std::shared_ptr<Material> Parser::readMaterial(Value& material)
 {
-    assert(material.HasMember("type") && "materials must have members : [type]");
-
+    assert(material.HasMember("type") && "materials must have member: [type]");
     std::string type = readString(material["type"], "material type");
 
     // Material == Normal
@@ -178,7 +216,7 @@ std::shared_ptr<Material> Parser::readMaterial(Value& material)
         return std::make_shared<BlinnPhong>(ks, kd, kr, specExp, color);
     }
     else {
-        std::cerr << "error existing material type is called: " << type << std::endl;
+        std::cerr << "error material type [ " << type << " ] doesn't exist" << std::endl;
         exit(-1);
     }
 }

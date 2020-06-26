@@ -33,6 +33,9 @@
 #include "../geometry/box.h"
 #include "../core/scene.h"
 
+#include "../accelerators/aabb.h"
+#include "../accelerators/bvh.h"
+
 #include "../core/material.h"
 #include "../materials/normal.h"
 #include "../materials/dielectric.h"
@@ -45,17 +48,34 @@
 using namespace rapidjson;
 
 ///////////////////////////////////////////////////////////////////////////
+// Settings                                                              //
+///////////////////////////////////////////////////////////////////////////
+
+struct Settings {
+    unsigned int width;
+    unsigned int height;
+    unsigned int samples;
+    bool bvh;
+
+    Settings(unsigned int w, unsigned int h, unsigned int s, bool b) 
+        : width(w), height(h), samples(s), bvh(b) {}
+};
+
+///////////////////////////////////////////////////////////////////////////
 // Parser                                                                //
 ///////////////////////////////////////////////////////////////////////////
 
 class Parser
 {
+private:
     typedef std::unordered_map<std::string, std::shared_ptr<Material>> MaterialList;
 
 public:
-    static std::unique_ptr<Camera> readCamera(Value& value, float aspectRatio);
+    static std::shared_ptr<Settings> readSettings(Value& value);
 
-    static std::unique_ptr<Scene> readScene(Value& value);
+    static std::unique_ptr<Camera> readCamera(Value& value, std::shared_ptr<Settings> settings);
+
+    static std::unique_ptr<Scene> readScene(Value& value, std::shared_ptr<Settings> settings);
 
     static void storeMaterial(MaterialList& sceneMaterials, Value& material);
 
