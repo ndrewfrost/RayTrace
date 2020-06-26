@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <utility> 
+#include <chrono>
 
 #include "rapidjson/document.h"
 #include "rapidjson/istreamwrapper.h"
@@ -16,10 +17,6 @@
 #include "../io/display.h"
 
 using std::shared_ptr;
-
-const unsigned int g_width = 500;
-const unsigned int g_height = 500;
-const unsigned int g_samples = 5;
 
 ///////////////////////////////////////////////////////////////////////////
 // Main / Entry Point                                                    //
@@ -48,20 +45,30 @@ int main(int argc, char** argv) {
     doc.ParseStream(is);
     ifs.close();
 
+    // Read renderer settings
+    assert(doc.HasMember("settings") && "Input Json must have member settings");
+    shared_ptr<Settings> settings = Parser::readSettings(doc["settings"]);
+
     // generate a camera
     assert(doc.HasMember("camera") && "Input Json must have member camera");
-    float aspectRatio = static_cast<float>(g_width) / static_cast<float>(g_height);
-    shared_ptr<Camera> camera = Parser::readCamera(doc["camera"], aspectRatio);
+    shared_ptr<Camera> camera = Parser::readCamera(doc["camera"], settings);
 
     // generate the scene
-    shared_ptr<Scene> scene = Parser::readScene(doc["scene"]);
-
+    shared_ptr<Scene> scene = Parser::readScene(doc["scene"], settings);
+   
     // generate output
-    shared_ptr<DisplayImage> output = std::make_shared<DisplayImage>(g_width, g_height, g_samples);
+    shared_ptr<DisplayImage> output = std::make_shared<DisplayImage>(settings);
 
     // render scene 
     RayTracer tracer = RayTracer(camera, scene, output);
+    auto t1 = std::chrono::high_resolution_clock::now();
+
     tracer.render();
+
+    auto t2 = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 ).count();
+
+    std::cout << "\nTime to Render: " <<  duration << "ms" << std::endl;
 
     // GUI
     SDL_Init(SDL_INIT_VIDEO);
@@ -69,7 +76,7 @@ int main(int argc, char** argv) {
     SDL_Window* window = SDL_CreateWindow(
         "Ray Tracing",
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-        g_width, g_height,
+        settings->width, settings->height,
         SDL_WINDOW_SHOWN);
 
     SDL_Surface* surface = SDL_GetWindowSurface(window);

@@ -10,6 +10,7 @@
 
 #include "../common/glm_common.h"
 #include "../common/math.h"
+#include "parser.h"
 
 #include <memory>
 #include <thread>
@@ -54,10 +55,8 @@ class DisplayImage
 public:
     DisplayImage() : m_width(0), m_height(0), m_pixels(nullptr), m_samples(1) {}
 
-    DisplayImage(const unsigned int width, 
-                 const unsigned int height, 
-                 const unsigned int nSamples = 1)
-        : m_width(width), m_height(height), m_samples(nSamples)
+    DisplayImage(std::shared_ptr<Settings> settings)
+        : m_width(settings->width), m_height(settings->height), m_samples(settings->samples)
     {
         m_pixels = std::unique_ptr<RGB[]>(new RGB[m_width * m_height]);
         for (unsigned int i = 0; i < m_width * m_height; ++i)
@@ -92,7 +91,7 @@ public:
         color.y = clamp(color.y, 0.f, 1.f);
         color.z = clamp(color.z, 0.f, 1.f);
 
-        unsigned int index = (m_height - y - 1) * m_height +s x;
+        unsigned int index = (m_height - y - 1) * m_height + x;
         m_pixels[index].reassign(color);
     }
 
@@ -106,6 +105,5 @@ private:
     unsigned int m_width, m_height, m_samples;
     std::unique_ptr<RGB[]> m_pixels;
 };
-
 
 #endif // !DISPLAY_H_
