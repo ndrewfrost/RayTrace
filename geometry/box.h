@@ -27,6 +27,7 @@ public:
 
     virtual bool intersect(const Ray& ray, float tMin, float tMax, HitRecord& record);
 
+    virtual bool boundingBox(aabb& bBox);
 
 private:
     std::vector<std::shared_ptr<Geometry>> m_planes;

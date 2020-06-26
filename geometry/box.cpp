@@ -63,3 +63,19 @@ bool Box::intersect(const Ray& ray, float tMin, float tMax, HitRecord& record)
     }
     return intersect;
 }
+
+//-------------------------------------------------------------------------
+// Generate bounding box for box
+//
+bool Box::boundingBox(aabb& bBox)
+{
+    aabb one, two;
+    m_planes.at(0)->boundingBox(one);
+    for (std::size_t ind = 1; ind != m_planes.size(); ++ind) {
+        m_planes.at(ind)->boundingBox(two);
+        one = aabb::surroundingBox(one, two);
+    }
+
+    bBox = one;
+    return true;
+}
