@@ -38,7 +38,7 @@ Plane::Plane(glm::vec3 center, float width, float height,
     m_v3 = rotate(m_v3, rotation);
     m_v3 = center + m_v3;
 
-    m_normal = glm::vec3(0, 1, 0);
+    m_normal = glm::vec3(0.f, 1.f, 0.f);
     m_normal = rotate(m_normal, rotation);
 }
 
