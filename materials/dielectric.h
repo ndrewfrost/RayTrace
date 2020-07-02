@@ -3,7 +3,7 @@
  * Andrew Frost
  * 2020
  *
- */
+ 
 
 #ifndef DIELECTRIC_H_
 #define DIELECTRIC_H_
@@ -22,10 +22,10 @@ public:
 
     ~Dielectric() = default;
 
-    virtual bool scatter(const Ray& rayIn, Ray& rayOut,
-        glm::vec3& attenuation, const HitRecord& hitRecord) const
+    virtual bool sample(const Ray& rayIn, Ray& rayOut,
+                         const HitRecord& hitRecord) const
     {
-        attenuation = glm::vec3(1.0f, 1.0f, 1.0f);
+        //attenuation = glm::vec3(1.0f, 1.0f, 1.0f);
         float eta = hitRecord.frontFace ? (1.0f / m_refractionIdx) : m_refractionIdx;
         
         glm::vec3 unitDir = glm::normalize(rayIn.direction());
@@ -60,3 +60,4 @@ private:
 };
 
 #endif // !DIELECTRIC_H_
+*/

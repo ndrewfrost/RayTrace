@@ -10,51 +10,63 @@
 
 #include "../core/material.h"
 
- ///////////////////////////////////////////////////////////////////////////
- // BlinnPhong                                                            //
- ///////////////////////////////////////////////////////////////////////////
-
+///////////////////////////////////////////////////////////////////////////
+// BlinnPhong                                                            //
+///////////////////////////////////////////////////////////////////////////
+/*
 class BlinnPhong : public Material
 {
 public:
     BlinnPhong(float ks, float kd, float kr, float specularExp, glm::vec3 color)
-        : Material(color), m_ks(ks), m_kd(kd), m_kr(kr), m_specularExp(specularExp) {}
+        : m_color(color), m_ks(ks), m_kd(kd), m_kr(kr), m_specularExp(specularExp) {}
 
     ~BlinnPhong() = default;
 
-    virtual bool scatter(const Ray& rayIn, Ray& rayOut,
-        glm::vec3& attenuation, const HitRecord& hitRecord) const
+    virtual bool sample(const Ray& rayIn, Ray& rayOut,
+                        const HitRecord& hitRecord) const
     {
-        glm::vec3 dirOut = hitRecord.normal + rndPointUnitSphere();
+        glm::vec3 dirOut = hitRecord.normal + rndPointHemisphere();
         rayOut = Ray(hitRecord.point, dirOut);
-        attenuation = getAmbient() + getDiffuse() + getSpecular();
         return true;
     }
 
-private:
-
-    glm::vec3 getAmbient() const
+    virtual glm::vec3 brdf(const Ray& rayIn, 
+                           const Ray& rayOut,
+                           const HitRecord& record) const
     {
-        return 0.08f * m_diffuseColor;
+        glm::vec3 half = glm::normalize(rayOut.direction() + rayIn.direction());
+        
+        // ambient
+        glm::vec3 ambient = 0.08f * m_color;
+
+        // diffuse
+        glm::vec3 diffuse = glm::vec3(0.f);
+        float diffuseAngle = glm::dot(rayOut.direction(), record.normal);
+        if (diffuseAngle >= 0.f)
+            diffuse = m_kd * diffuseAngle * m_color;
+
+        // specular
+        float specular = 0.f;
+        float specAngle = glm::dot(half, record.normal);
+        if (specAngle >= 0.f) 
+            specular = m_ks * powf(specAngle, m_specularExp);
+
+        return ambient + diffuse * specular;
+        
     }
 
-    glm::vec3 getDiffuse() const
+    virtual float pdf(const Ray& rayIn, const Ray& rayOut) const
     {
-        glm::vec3 diffuse = glm::vec3(0, 0, 0);
-
-        return diffuse;
+        return  1 / (2 * PI);
     }
 
-    glm::vec3 getSpecular() const
-    {
-        glm::vec3 specular = glm::vec3(0, 0, 0);
-
-        return specular;
-    }
+    virtual glm::vec3 emitted() const { return glm::vec3(0); }
 
 private:
     float m_ks, m_kd, m_kr;
     float m_specularExp;
-};
 
+    glm::vec3 m_color;
+};
+*/
 #endif // !BLINN_PHONG_H_
