@@ -12,24 +12,34 @@
 #include <memory>
 
 #include "geometry.h"
-#include "../geometry/sphere.h"
+#include "light.h"
+#include "../lights/area.h"
 
- ///////////////////////////////////////////////////////////////////////////
- // Scene                                                                 //
- ///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+// Scene                                                                 //
+///////////////////////////////////////////////////////////////////////////
 
-class Scene : Geometry
+class Scene
 {
 public:
     Scene() = default;
-
-    Scene(std::vector<std::shared_ptr<Geometry>> geometry) : m_objects(geometry) {}
-
+    
+    Scene(std::vector<std::shared_ptr<Geometry>> geometry, 
+          std::vector<std::shared_ptr<Light>>    lights)
+        : m_objects(geometry), m_lights(lights) {}
+    
     ~Scene() = default;
 
-    bool intersect(const Ray& ray, float tMin, float tMax, HitRecord& record);
+    bool intersectGeometry(const Ray& ray, float tMin, float tMax, HitRecord& record);
+
+    bool boundingBox(aabb& bBox);
+    
+    glm::vec3 sampleLights(const Ray & ray, HitRecord & record);
+       
+    std::vector<std::shared_ptr<Geometry>>& getObjects() { return m_objects; }
 
 private:
+    std::vector<std::shared_ptr<Light>>    m_lights;
     std::vector<std::shared_ptr<Geometry>> m_objects;
 
 };
