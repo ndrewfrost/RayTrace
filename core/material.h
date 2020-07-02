@@ -26,6 +26,16 @@ public:
     virtual bool scatter(const Ray& rayIn, Ray& rayOut,
         glm::vec3& attenuation, const HitRecord& hitRecord) const = 0;
 
+    //---------------------------------------------------------------------
+    // return emitted light of material
+    //
+    virtual glm::vec3 emitted() const { return glm::vec3(0.f); }
+
+    //---------------------------------------------------------------------
+    // T/F material is emissive
+    //
+    virtual bool emits() const { return false; }
+
 protected:
     glm::vec3 m_diffuseColor;
 };
