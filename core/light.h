@@ -18,10 +18,12 @@ class Light {
 
 public:
     Light() = default;
-     
+
     ~Light() = default;
-    
+
     virtual glm::vec3 sampleLight(glm::vec3 dest) = 0;
+
+    virtual bool areaLight() { return false; }
 
 protected:
 
