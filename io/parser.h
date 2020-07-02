@@ -41,8 +41,10 @@
 #include "../materials/dielectric.h"
 #include "../materials/lambertian.h"
 #include "../materials/blinnphong.h"
+#include "../materials/orennayer.h"
 #include "../materials/disney.h"
 #include "../materials/gooch.h"
+#include "../materials/emissive.h"
 
 #include "rapidjson/document.h"
 using namespace rapidjson;
