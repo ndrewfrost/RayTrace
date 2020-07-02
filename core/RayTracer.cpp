@@ -8,7 +8,7 @@
 #include "raytracer.h"
 
 ///////////////////////////////////////////////////////////////////////////
-// Ray Tracer                                                            //
+// Ray Tracing                                                           //
 ///////////////////////////////////////////////////////////////////////////
 
 //-------------------------------------------------------------------------
@@ -39,7 +39,7 @@ void RayTracer::render()
 
                 Ray r = m_camera->getRay(u, v);
 
-                pixelColor += rayColor(r, 50);
+                pixelColor += trace(r, 50);
             }
 
             m_output->setPixel(x, y, pixelColor);
@@ -50,25 +50,38 @@ void RayTracer::render()
 //-------------------------------------------------------------------------
 // Color the ray
 //
-glm::vec3 RayTracer::rayColor(const Ray& r, int depth)
+glm::vec3 RayTracer::trace(const Ray& ray, int depth)
 {
-    HitRecord record;
-    // ray bound limit
+    // ray bounce limit
     if (depth <= 0)
         return glm::vec3(0.f, 0.f, 0.f);
-    
-    // Collect light
-    if (m_scene->intersect(r, 0.001f, infinity, record)) {
-        Ray rayOut;
-        glm::vec3 attenuation;
 
-        if (record.material->scatter(r, rayOut, attenuation, record))
-            return attenuation * rayColor(rayOut, depth - 1);
-        return glm::vec3(0.f, 0.f, 0.f);
-    }
+    // ray hit nothing, return background colour / Black
+    HitRecord record;
+    if (!m_scene->intersectGeometry(ray, 0.001f, infinity, record))
+        return glm::vec3(0.02f, 0.02f, 0.02f);
+
+    // Emissive Material    
+    if (record.material->emits())
+        return record.material->emitted(); // Hit an area light
     
-    // Background color
-    glm::vec3 unitDir = glm::normalize(r.direction());
-    float t = 0.5f * (unitDir.y + 1.0f);
-    return (1.0f - t) * glm::vec3(1.0f, 1.0f, 1.0f) + t * glm::vec3(0.3f, 0.4f, 0.8f);
+    Ray rayOut;
+
+    // Light Indirect
+    glm::vec3 sample = record.material->sample(ray, rayOut, record);
+
+    glm::vec3 indirect = sample * trace(rayOut, depth - 1)
+                                * glm::dot(record.normal, rayOut.direction())
+                                / record.material->pdf(ray, rayOut);
+
+    // Sample a light
+    //if(m_scene->sampleLight(hitPoint, rayOut))
+    // Light Direct
+    //glm::vec3 direct(0.f);
+    //glm::vec3 bsdf(0.f);
+    //glm::vec3 direct = bsdf * glm::dot(record.normal, ) 
+    //                 * glm::dot(record.normal, rayOut.direction())
+    //                 / record.material->pdf(ray, rayOut);
+    
+    return indirect;
 }

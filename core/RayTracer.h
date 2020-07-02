@@ -29,7 +29,7 @@ public:
 
     void render();
 
-    glm::vec3 rayColor(const Ray& r, int depth);
+    glm::vec3 trace(const Ray& ray, int depth);
 
 private:
     std::shared_ptr<Camera>       m_camera = nullptr;

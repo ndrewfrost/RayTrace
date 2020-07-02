@@ -26,7 +26,7 @@ public:
     ~Ray() = default;
 
     Ray(const glm::vec3& origin, const glm::vec3& direction)
-        : m_origin(origin), m_direction(direction) {}
+        : m_origin(origin), m_direction(glm::normalize(direction)) {}
 
     glm::vec3 origin()    const { return m_origin; }
     glm::vec3 direction() const { return m_direction; }
