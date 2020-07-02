@@ -2,40 +2,35 @@
   "settings": {
     "width"  : 500,
     "height" : 500,
-    "samples": 10,
-    "bvh"    : true
+    "samples": 200,
+    "bvh"    : false
   },
   "camera": {
     "type": "pinhole",
-    "origin": [ 1.0, 1.0, 0.0 ],
-    "lookat": [ 0.0, 0.0, -1.0 ],
-    "vup"   : [ 0.0, 1.0, 0.0 ],
+    "origin": [ 4, 2, 1 ],
+    "lookat": [ 0, 0, 0 ],
+    "vup"   : [ 0, 1, 0 ],
     "hfov"  : 90.0
   },
   "scene": {
     "lights": [
-      { "type": "point", "pos": [ 0.0, 2.0, -1.0 ], "color": [ 1.0, 1.0, 1.0 ], "intensity": 0.2 }  
+      { "type": "point", "pos": [ 0.0, 5.0, -1.0 ], "color": [ 1.0, 1.0, 1.0 ], "intensity": 1 }  
     ],
     "materials": [
-      { "name": "diel", "type": "dielectric", "ri": 1.5 },
-      { "name": "blinn", "type": "blinnphong", "ks": 0.4, "kd": 0.4, "kr": 0.1, "specularexp": 2.0, "color": [ 0.1, 0.1, 0.8 ] },
-      { "name": "material02", "type": "lambertian", "color": [ 0.1, 0.8, 0.3 ] },
-      { "name": "material01", "type": "lambertian", "color": [ 0.7, 0.3, 0.3 ] },
-      { "name": "triangle",   "type": "lambertian", "color": [ 0.32, 0.12, 0.43 ] },
-      { "name": "plane",      "type": "lambertian", "color": [ 0.0, 0.0, 0.9 ] },
-      { "name": "box",        "type": "lambertian", "color": [ 0.0, 0.6, 0.0 ] }
+      { "name": "ground", "type": "gooch", "color" : [ 0.0, 0.8, 0.5 ]},
+      { "name": "wall", "type": "gooch", "color" : [ 1, 1, 1 ]},
+      { "name": "sphere", "type": "gooch", "color" : [ 0.8, 0.0, 0.8 ]},
+      
+      { "name": "light", "type": "emissive", "color" : [ 1, 1, 1 ], "intensity" : 2}
     ],
     "geometry": [
-      { "type": "sphere", "center": [ 1.0, 0.0, -1.0 ], "radius": 0.5, "material": "diel" },
-      { "type": "sphere", "center": [ -0.4, -0.2, -0.3 ], "radius": 0.3, "material": "blinn" },
-      { "type": "sphere", "center": [ 1.0, -0.4, -0.5 ],  "radius": 0.1, "material": "material02" },
-      { "type": "sphere", "center": [ -1.0, 1.0, -1.0 ], "radius": 0.5, "material": { "type": "normal" } },
-      { "type": "sphere", "center": [ -1.0, 0.0, -1.0 ], "radius": 0.5, "material": { "type": "lambertian", "color": [ 0.8, 0.8, 0.0 ] }},
-
-      { "type": "box", "center": [ 0, 0.5, -1.0 ], "rot": [ 0, 20, 0 ], "width": 0.5,  "height": 0.5, "depth": 0.5, "material": "box" },
-
-      { "type": "triangle", "v0": [ 0.0, 0.0, -2.0 ], "v1": [ -1.5, 0.0, -2.0 ], "v2": [ 0.0, 1.5, -2.0 ], "material": "triangle" },
-      { "type": "triangle", "v0": [ -1.5, 0.0, 0.5 ], "v1": [ -1.2, 0.0, 0.0 ], "v2": [ -1.5, 1.5, 0.5 ], "material": "triangle" }
+      { "type": "sphere", "center": [ 1.0, 0.5, 0 ], "radius": 0.5, "material": "sphere" },
+      { "type": "box"   , "center": [ 1.5, 0.5, -1.5], "rot": [0,45,0], "width": 1, "height": 1, "depth" :  1, "material": "sphere"},
+      
+      { "type": "sphere", "center": [ 4.0, 2.0, -1.0 ], "radius": 1, "material": "light" },
+      
+      { "type": "plane", "center": [ 0, -1, 0 ], "rot" : [ 0, 0, 0 ], "width" : 20, "height" : 20, "material" : "ground" },
+      { "type": "plane", "center": [ -1.5, 0.5, -1 ], "rot" : [ 0, 0, -90 ], "width" : 20, "height" : 20, "material" : "wall" }
     ]
   }
 }
