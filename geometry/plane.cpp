@@ -94,6 +94,11 @@ bool Plane::boundingBox(aabb& bBox)
     float zmax = m_v0.z > m_v1.z ? (m_v0.z > m_v2.z ? (m_v0.z > m_v3.z ? m_v0.z : m_v3.z) : m_v2.z)
         : (m_v1.z > m_v2.z ? (m_v1.z > m_v3.z ? m_v1.z : m_v3.z) : m_v2.z);
 
+    // if min == max for any axis add a tiny amount to create a 3D volume since planes have no volume 
+    if (xmin == xmax) xmin -= 0.0001f; xmax += 0.0001f;
+    if (ymin == ymax) ymin -= 0.0001f; ymax += 0.0001f;
+    if (zmin == zmax) zmin -= 0.0001f; zmax += 0.0001f;
+
     bBox = aabb(glm::vec3(xmin, ymin, zmin),
         glm::vec3(xmax, ymax, zmax));
     return true;

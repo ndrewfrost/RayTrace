@@ -24,7 +24,7 @@ bool Triangle::intersect(const Ray& ray, float tMin, float tMax, HitRecord& reco
     float determinant = glm::dot(v0v1, p);
 
     // Back face culling
-    if (determinant < 0.00001f) return false;
+    if (fabs(determinant) < 0.00001f) return false;
 
     float invDeterminant = 1.0f / determinant;
 
@@ -40,7 +40,7 @@ bool Triangle::intersect(const Ray& ray, float tMin, float tMax, HitRecord& reco
 
     // Hit
     if (t < tMax && t > tMin) {
-        record.frontFace = true;
+        record.frontFace = (determinant < 0.00001f) ? false : true;
         record.material = m_material;
         record.t = t;
         record.point = ray.at(t);
@@ -49,7 +49,6 @@ bool Triangle::intersect(const Ray& ray, float tMin, float tMax, HitRecord& reco
     }
     // Miss
     return false;
-}
 
 //-------------------------------------------------------------------------
 // Generate BBox for triangle
@@ -63,6 +62,11 @@ bool Triangle::boundingBox(aabb& bBox)
     float xmax = m_v0.x > m_v1.x ? (m_v0.x > m_v2.x ? m_v0.x : m_v2.x) : (m_v1.x > m_v2.x ? m_v1.x : m_v2.x);
     float ymax = m_v0.y > m_v1.y ? (m_v0.y > m_v2.y ? m_v0.y : m_v2.y) : (m_v1.y > m_v2.y ? m_v1.y : m_v2.y);
     float zmax = m_v0.z > m_v1.z ? (m_v0.z > m_v2.z ? m_v0.z : m_v2.z) : (m_v1.z > m_v2.z ? m_v1.z : m_v2.z);
+
+    // if min == max for any axis add a tiny amount to create a 3D volume since planes have no volume 
+    if (xmin == xmax) xmin -= 0.0001f; xmax += 0.0001f;
+    if (ymin == ymax) ymin -= 0.0001f; ymax += 0.0001f;
+    if (zmin == zmax) zmin -= 0.0001f; zmax += 0.0001f;
 
     bBox = aabb(glm::vec3(xmin, ymin, zmin),
         glm::vec3(xmax, ymax, zmax));
