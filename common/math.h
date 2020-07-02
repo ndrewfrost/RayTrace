@@ -26,12 +26,21 @@ inline float sqr(float x)
 //-------------------------------------------------------------------------
 // clamp within range (min, max)
 //
-inline float clamp(float x, float min, float max)
+inline float clamp(float x, float min = 0.f, float max = 1.f)
 {
     if (x < min) return min;
     if (x > max) return max;
     return x;
 }
+
+//-------------------------------------------------------------------------
+// clamp all components of vector within range (min, max)
+//
+inline glm::vec3 clamp(glm::vec3 v, float min = 0.f, float max = 1.f)
+{
+    return glm::vec3(clamp(v.x, min, max), clamp(v.y, min, max), clamp(v.z, min, max));
+}
+
 //-------------------------------------------------------------------------
 // degrees to radian
 //
@@ -89,7 +98,15 @@ inline glm::vec3 randomVec3(float min, float max)
 }
 
 //-------------------------------------------------------------------------
-// Generate a point in a unit sphere (A rejection method
+// Two points in same hemisphere
+//
+inline bool SameHemisphere(const glm::vec3 & one, const glm::vec3 & two)
+{
+    return one.z * two.z > 0;
+}
+
+//-------------------------------------------------------------------------
+// Generate a point in a unit sphere (A rejection method)
 //
 inline glm::vec3 rndPointUnitSphere()
 {
@@ -101,16 +118,39 @@ inline glm::vec3 rndPointUnitSphere()
 }
 
 //-------------------------------------------------------------------------
+// Generate a point in a unit hemisphere (A rejection method)
+//
+inline glm::vec3 rndPointHemisphere(glm::vec3 n = glm::vec3(0.f,1.f,0.f))
+{
+    while (true) {
+        glm::vec3 point = randomVec3(-1.0f, 1.f);
+        if (glm::dot(point, point) >= 1.f) continue;
+        point = glm::normalize(point);
+        if (glm::dot(point, n) <= 0.f) continue;
+        return point;
+    }
+}
+
+//-------------------------------------------------------------------------
 // Generate a point in a unit disk (A rejection method)
 //
 inline glm::vec2 rndPointUnitDisk()
 {
     while (true) {
         glm::vec2 point(randomFloat(), randomFloat());
-        if (glm::dot(point, point) >= 1) continue;
+        if (glm::dot(point, point) > 0.f ) continue;
         return point;
     }
 }
+
+//-------------------------------------------------------------------------
+// 
+//
+inline float absCosTheta(const glm::vec3 &w) 
+{
+    return fabs(w.z);
+}
+
 
 //-------------------------------------------------------------------------
 // Rotate around axis, X then Y then Z
@@ -118,6 +158,7 @@ inline glm::vec2 rndPointUnitDisk()
 inline glm::vec3 rotate(glm::vec3 point, glm::vec3 rotation) {
     return glm::rotateZ(glm::rotateY(glm::rotateX(point, glm::radians(rotation.x)), glm::radians(rotation.y)), glm::radians(rotation.z));
 }
+
 
 //-------------------------------------------------------------------------
 // Vec3 to string
