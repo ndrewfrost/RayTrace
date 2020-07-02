@@ -10,6 +10,7 @@
 
 #include <memory>
 
+#include "../accelerators/aabb.h"
 #include "../common/math.h"
 #include "material.h"
 #include "ray.h"
