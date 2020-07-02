@@ -9,6 +9,7 @@
 #define MATERIAL_H_
 
 #include "ray.h"
+#include "../common/math.h"
 
 ///////////////////////////////////////////////////////////////////////////
 // Material                                                              //
@@ -17,15 +18,35 @@
 class Material
 {
 public:
-    Material() : m_diffuseColor(0.f,0.f,0.f) {}
-
-    Material(glm::vec3 color) : m_diffuseColor(color) {}
+    Material() {}
 
     virtual ~Material() = default;
 
-    virtual bool scatter(const Ray& rayIn, Ray& rayOut,
-        glm::vec3& attenuation, const HitRecord& hitRecord) const = 0;
+    //---------------------------------------------------------------------
+    //
+    //
+    virtual glm::vec3 f(const Ray& rayIn, Ray& rayOut,
+        const HitRecord& hitRecord) const = 0;
 
+    //---------------------------------------------------------------------
+    //
+    //
+    virtual glm::vec3 sample(const Ray& rayIn, Ray& rayOut,
+                             const HitRecord& hitRecord) const
+    {
+        glm::vec3 dirOut = rndPointHemisphere(hitRecord.normal);
+        rayOut = Ray(hitRecord.point, dirOut);
+
+        return f(rayIn, rayOut, hitRecord);
+    }
+
+    //---------------------------------------------------------------------
+    // Probability distribution function
+    //
+    virtual float pdf(const Ray& rayIn, const Ray& rayOut) const
+    {
+        return (1 / PI);
+    }
     //---------------------------------------------------------------------
     // return emitted light of material
     //
